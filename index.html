@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0e0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Corte">
+<title>Corte</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0e0d;--card:#1a1815;--card2:#221f1b;--ink:#ece4d4;--mut:#9a907c;--line:#2e2a24;--acc:#b8904f;--acc-ink:#15120e;--ok:#8fae6b;--warn:#d6a74a;--bad:#c4553b;--r:12px;--serif:"Playfair Display",Georgia,serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;color:var(--ink);font:15px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg)}
+body{background:repeating-linear-gradient(45deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px),repeating-linear-gradient(-45deg,rgba(0,0,0,.25) 0 2px,transparent 2px 6px),radial-gradient(ellipse at top,#1d1a16 0%,#0f0e0d 60%);background-attachment:fixed;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(12,11,10,.96);backdrop-filter:blur(6px);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--acc)}
+header h1{margin:0;font:800 20px/1 var(--serif);letter-spacing:4px;text-transform:uppercase;color:var(--acc)}
+header small{color:var(--mut);font-size:11px;letter-spacing:.5px}
+header button{background:none;border:1px solid var(--line);color:var(--mut);border-radius:6px;padding:6px 9px;font:inherit;font-size:12px}
+main{padding:14px 12px 110px;max-width:640px;margin:0 auto}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0c0b0a;border-top:1px solid var(--acc);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav button{flex:1;border:0;background:none;padding:9px 0 8px;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit}
+nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+nav button.on{color:var(--acc)}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center}.sp{justify-content:space-between}.wrap{flex-wrap:wrap}
+.k{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1.2px}
+.big{font:800 28px/1.1 var(--serif)}.mid{font:700 19px/1.2 var(--serif)}.mut{color:var(--mut)}.acc{color:var(--acc)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px;text-align:center}.st b{display:block;font:800 21px var(--serif)}
+.pill{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:3px;background:#2a2620;color:var(--mut);font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--line);white-space:nowrap}
+.pill.ok{color:var(--ok);border-color:#3c4a2e}.pill.warn{color:var(--warn);border-color:#5a4724}.pill.bad{color:var(--bad);border-color:#5a2a20}.pill.pe{color:#c9b892;border-color:#4a4233}
+.item{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;font:inherit;color:inherit}
+.item b{font-family:var(--serif);font-size:16px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
+.chips button{border:1px solid var(--line);background:var(--card);border-radius:3px;padding:6px 12px;font:inherit;font-size:12px;white-space:nowrap;color:var(--ink)}
+.chips button.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+select,input,textarea{font:inherit;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:#141210;color:var(--ink);color-scheme:dark}
+label{display:block;font-size:11px;color:var(--mut);margin:12px 0 5px;text-transform:uppercase;letter-spacing:1px}
+.btn{display:block;width:100%;border:1px solid var(--acc);border-radius:8px;padding:14px;font:inherit;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px;background:var(--acc);color:var(--acc-ink);margin-top:12px}
+.btn.sec{background:transparent;color:var(--acc)}.btn.wa{background:#1f3b2a;border-color:#2f5a3f;color:#cfe9d6}.btn.bad{background:transparent;border-color:#5a2a20;color:var(--bad)}
+.btn.sm{display:inline-block;width:auto;padding:9px 14px;margin:0;font-size:12px}
+.fab{position:fixed;right:16px;bottom:84px;z-index:7;border:1px solid var(--acc);border-radius:30px;background:var(--acc);color:var(--acc-ink);font:inherit;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-size:13px;padding:14px 20px;box-shadow:0 8px 22px rgba(0,0,0,.6)}
+.dot{width:12px;height:12px;border-radius:50%;border:1px solid rgba(255,255,255,.3);display:inline-block;flex:none}
+.step{display:flex;align-items:center;flex:none}
+.step button{width:34px;height:34px;border:1px solid var(--line);border-radius:6px;background:#221f1b;color:var(--ink);font-size:18px}
+.step input{width:52px;border:0;background:transparent;text-align:center;padding:4px;font-weight:700}
+.lin{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:8px;padding:5px 5px 5px 10px;background:#141210;margin-bottom:6px}
+.lin .nm{display:flex;align-items:center;gap:7px;min-width:0}
+.x{border:0;background:none;color:var(--bad);font-size:20px;padding:0 6px}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:20;display:flex;align-items:flex-end}
+.sheet>div{background:var(--bg);border-top:1px solid var(--acc);width:100%;max-width:640px;margin:0 auto;border-radius:16px 16px 0 0;max-height:93vh;overflow:auto;padding:18px 14px calc(28px + env(safe-area-inset-bottom))}
+.sheet h2{margin:2px 0 6px;font:800 22px/1.2 var(--serif)}
+.sheet h3{margin:20px 0 8px;font:700 15px var(--serif);color:var(--acc);letter-spacing:1px;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right}
+td:first-child,th:first-child{text-align:left}
+th{font-size:10.5px;color:var(--mut);text-transform:uppercase;font-weight:600;letter-spacing:1px}
+tr.tot td{font-weight:700;color:var(--acc);border-bottom:0}
+.toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--acc);color:var(--acc-ink);padding:10px 16px;border-radius:8px;z-index:60;font-size:14px;font-weight:600;max-width:90vw}
+.load{position:fixed;inset:0;background:rgba(10,9,8,.75);z-index:50;display:flex;align-items:center;justify-content:center;font:700 16px var(--serif);letter-spacing:2px;color:var(--acc);text-align:center;padding:20px}
+#login{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:24px;max-width:380px;margin:0 auto;text-align:center}
+#login h1{font:800 44px/1 var(--serif);letter-spacing:8px;color:var(--acc);margin:0 0 6px}
+#login .rule{height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent);margin:14px 0 22px}
+#login input{font-size:26px;text-align:center;letter-spacing:10px}
+.alert{border-left:3px solid var(--warn)}.alert.bad{border-left-color:var(--bad)}
+.et{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.et .nm{font-weight:600}.et small{display:block;color:var(--mut);font-size:12px}
+.seq{display:flex;flex-wrap:wrap;gap:5px}
+.seq span{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#141210;border-radius:6px;padding:3px 7px;font-size:12px}
+.seq em{font-style:normal;color:var(--mut);font-size:10px}
+.seq .sepf{border-style:dashed;border-color:var(--warn);color:var(--warn)}
+.ft{width:100%;max-height:220px;object-fit:contain;border-radius:8px;border:1px solid var(--line);background:#000;margin-top:8px}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.demo{background:#2a2112;border:1px solid #5a4724;color:var(--warn);font-size:12px;padding:8px 10px;border-radius:8px;margin-bottom:10px}
+.fila{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#221f1b;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px;color:var(--warn)}
+.fila button{background:var(--acc);border:0;border-radius:6px;padding:6px 10px;font:inherit;font-size:12px;font-weight:700}
+.sync{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;margin-left:6px}.sync.on{background:var(--warn)}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+.hint{font-size:12px;color:var(--mut);margin-top:4px}
+</style>
+</head>
+<body>
+<div id="login">
+  <h1>CORTE</h1>
+  <p class="mut" style="margin:0;letter-spacing:3px;text-transform:uppercase;font-size:11px">Logari · Mooca</p><div class="rule"></div>
+  <p class="mut" style="margin:0 0 10px">Digite seu PIN</p>
+  <input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" onkeydown="if(event.key==='Enter')entrar()">
+  <button class="btn" onclick="entrar()">Entrar</button>
+  <p id="lerr" style="color:var(--bad)"></p>
+  <p id="ldemo" class="hint"></p>
+</div>
+<div id="app" style="display:none">
+  <header><div><h1 id="htit">Corte</h1><small id="sub"></small><span id="sync" class="sync"></span></div><button onclick="carregar(true)">↻</button></header>
+  <main id="main"></main>
+  <nav id="nav"></nav>
+  <div id="fabw"></div>
+</div>
+<script>
+/* ================= CONFIGURAÇÃO =================
+   API = link do Apps Script (Implantar > App da Web). Vazio = modo demonstração (dados só no aparelho). */
+const API='https://script.google.com/macros/s/AKfycbyxHiOKRZYJDbcumVw15mSdiRDdMSg2b752QJViz10_kH1_UuosrjnTegTtE0xug4Rl/exec';
+const DEMO=!API;
+/* ================================================ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const n0=v=>(+v||0).toLocaleString('pt-BR',{maximumFractionDigits:0});
+const m2=v=>(v===''||v==null)?'':(+v).toFixed(2).replace('.',',');
+const n1=v=>(+v||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
+const brl=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pad=n=>String(n).padStart(2,'0');
+const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const hoje=()=>dstr(new Date());
+const dbr=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+const dbrY=d=>d?dbr(d)+'/'+d.slice(0,4):'';
+const hm=iso=>{if(!iso)return'';const d=new Date(iso);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const dhm=iso=>{if(!iso)return'';const d=new Date(iso);return(dstr(d)===hoje()?'':dbr(dstr(d))+' ')+hm(iso)};
+const dur=(a,b)=>{const m=Math.round((new Date(b)-new Date(a))/60000);if(!(m>=0))return'';return m<60?m+' min':Math.floor(m/60)+'h'+(m%60?pad(m%60):'')};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isNaN(x)?0:x};
+function store(k,v){try{v===undefined?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}
+function getStore(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
+function loading(on,txt){let e=$('#ld');if(on&&!e){e=document.createElement('div');e.id='ld';e.className='load';document.body.appendChild(e)}if(e&&on)e.textContent=txt||'Carregando…';if(!on&&e)e.remove()}
+
+const ETAPAS=[['pedido','Pedido do tecido'],['descanso','Descanso do tecido'],['infesto','Infesto'],['corte','Corte'],['amarracao','Amarração'],['embalagem','Embalagem'],['contagem','Contagem dos papagaios']];
+const ETN=Object.fromEntries(ETAPAS);
+const CORES={Preto:'#141414',Marrom:'#6b4226',Branco:'#f4f4f2',Marfim:'#efe6cf',Marinho:'#1f2d5a',Azul:'#2b4c9b',Rubro:'#8e1b1b',Rubi:'#9b1240',Hera:'#2f5d3a',Amarelo:'#e3c13b',Frozen:'#a9d3e6'};
+const corHex=c=>CORES[c]||'#777';
+const dot=c=>`<i class="dot" style="background:${corHex(c)}"></i>`;
+
+/* ============ REGRAS DE DADOS (iguais no Code.gs) ============ */
+function opera(db,a,p){
+  if(a==='cfg'){db.config[p.k]=p.v;return}
+  const L=db[p.tab];if(!L)throw new Error('Aba desconhecida');
+  const id=p.rec?p.rec.id:p.id,i=L.findIndex(x=>x.id===id);
+  if(a==='put'){const r=JSON.parse(JSON.stringify(p.rec));if(i>=0){if(p.tab==='cortes')['log','ocorr','pags'].forEach(k=>r[k]=L[i][k]||[]);L[i]=r}else L.push(r);return}
+  if(i<0)throw new Error('Registro não encontrado');const R=L[i];
+  if(a==='del')L.splice(i,1);
+  else if(a==='set')R[p.campo]=p.valor;
+  else if(a==='push')R[p.campo]=(R[p.campo]||[]).concat([p.item]);
+  else if(a==='upd'){const it=(R[p.campo]||[]).find(x=>x.id===p.iid);if(it)Object.assign(it,p.patch)}
+  else if(a==='rm')R[p.campo]=(R[p.campo]||[]).filter(x=>x.id!==p.iid);
+  else throw new Error('Ação desconhecida')}
+function pode(u,a,p){if(u.papel==='admin')return;
+  if(a==='push'&&p.tab==='cortes'&&(p.campo==='log'||p.campo==='ocorr'))return;
+  if(a==='set'&&p.tab==='cortes'&&(p.campo==='cores'||p.campo==='packs'))return;
+  throw new Error('Sem permissão')}
+function visao(db,u){const d=JSON.parse(JSON.stringify(db));d.user=u;
+  if(u.papel!=='admin'){d.despesas=[];d.cortes.forEach(c=>{delete c.pags;delete c.preco});d.clientes.forEach(c=>{delete c.preco;delete c.chave});['diaria','socio'].forEach(k=>delete d.config[k])}
+  return d}
+function portalDe(db,cli){return{cliente:{nome:cli.nome},config:{empresa:db.config.empresa||''},
+  cortes:db.cortes.filter(c=>c.cli===cli.id).map(c=>{const x=JSON.parse(JSON.stringify(c));
+    x.log=(x.log||[]).map(l=>({e:l.e,t:l.t}));x.ocorr=(x.ocorr||[]).filter(o=>o.aut).map(o=>({id:o.id,desc:o.desc,aut:o.aut,fotos:o.fotos}));
+    x.pago=(x.pags||[]).reduce((s,p)=>s+(+p.valor||0),0);delete x.pags;return x})}}
+
+/* ============ CÁLCULO DO CORTE ============ */
+function tamsDe(c){return Object.keys(Object.assign({},c.enc||{},c.ret||{})).filter(t=>(+(c.enc||{})[t]||0)+(+(c.ret||{})[t]||0)>0)}
+function calc(c){
+  const T=tamsDe(c),enc=c.enc||{},ret=c.ret||{};
+  const encT=T.reduce((s,t)=>s+(+enc[t]||0),0),retT=T.reduce((s,t)=>s+(+ret[t]||0),0);
+  // principal: folhas × encaixes do risco · retalho (risco secundário): folhas de retalho × encaixes do mini risco
+  const cores=(c.cores||[]).map(x=>{const f=+x.folhas||0,fr=retT?(+x.fret||0):0,p={};let tot=0;T.forEach(t=>{p[t]=f*(+enc[t]||0)+fr*(+ret[t]||0);tot+=p[t]});return{cor:x.cor,rolos:+x.rolos||0,folhas:f,fret:fr,p,ret:fr*retT,tot}});
+  const porT={};T.forEach(t=>porT[t]=cores.reduce((s,x)=>s+x.p[t],0));
+  const folhas=cores.reduce((s,x)=>s+x.folhas,0),fret=cores.reduce((s,x)=>s+x.fret,0),rolos=cores.reduce((s,x)=>s+x.rolos,0);
+  const total=cores.reduce((s,x)=>s+x.tot,0),retalho=fret*retT;
+  const preco=+c.preco||0,valor=Math.round(total*preco*100)/100;
+  const pago=c.pago!=null?+c.pago:(c.pags||[]).reduce((s,p)=>s+(+p.valor||0),0);
+  // embalagem: cada encaixe = 1 pack (peças = folhas daquele enfesto); sacos com N packs do mesmo tamanho; retalho em sacos próprios
+  const ps=+c.packs||0,sacos=[];
+  const ensaca=(qt,f,rt)=>{if(ps)T.forEach(t=>{let packs=+qt[t]||0;while(packs>0&&f>0){const k=Math.min(ps,packs);sacos.push({tam:t,packs:k,pecas:k*f,folhas:f,ret:rt});packs-=k}})};
+  ensaca(enc,folhas,false);if(retT)ensaca(ret,fret,true);
+  sacos.forEach((s,i)=>{s.n=i+1});
+  return{T,cores,porT,folhas,fret,rolos,total,retalho,encT,retT,preco,valor,pago,saldo:Math.round((valor-pago)*100)/100,sacos}}
+// ordem do infesto: nunca repete a mesma cor seguida; se não der, entra 1 folha de outra cor para separar
+function seqInfesto(cs){const a=(cs||[]).filter(x=>+x.rolos>0).map(x=>({cor:x.cor,n:+x.rolos,tot:+x.rolos}));
+  if(a.length<2)return[];const out=[];let last=null;
+  while(a.some(x=>x.n>0)){
+    const ok=a.filter(x=>x.n>0&&x.cor!==last).sort((p,q)=>q.n-p.n||q.tot-p.tot);
+    if(ok.length){ok[0].n--;last=ok[0].cor;out.push({cor:last})}
+    else{const sep=a.filter(x=>x.cor!==last).sort((p,q)=>q.tot-p.tot)[0];out.push({cor:sep.cor,sep:1});last=sep.cor}}
+  return out}
+function seqHtml(cs){const q=seqInfesto(cs);if(!q.length)return'';let n=0;
+  return`<div class="seq">${q.map(x=>x.sep?`<span class="sepf">${dot(x.cor)}1 folha de ${esc(x.cor)}</span>`:`<span><em>${++n}</em>${dot(x.cor)}1 rolo ${esc(x.cor)}</span>`).join('')}</div>${q.some(x=>x.sep)?'<div class="hint">“1 folha” = só uma folha dessa cor para separar, sem gastar o rolo.</div>':''}`}
+function etSt(c,e){const L=(c.log||[]).filter(x=>x.e===e),i=L.filter(x=>x.t==='i').pop(),f=L.filter(x=>x.t==='f').pop();
+  const ok=!!f&&(!i||!i.em||!f.em||f.em>=i.em);return{i,f,ok,on:!!i&&!ok}}
+function proxima(c){for(const[e]of ETAPAS){const s=etSt(c,e);if(!s.ok)return{e,t:s.on?'f':'i'}}return null}
+function pendOc(c){return(c.ocorr||[]).filter(o=>!o.aut&&!o.neg)}
+function status(c){
+  if(c.retirado)return{t:'Retirado',k:'pe'};
+  if(pendOc(c).length)return{t:'Aguardando cliente',k:'bad'};
+  const p=proxima(c);if(!p)return{t:'Pronto p/ retirar',k:'ok'};
+  return p.t==='f'?{t:ETN[p.e],k:'warn'}:{t:'Próx.: '+ETN[p.e],k:''}}
+
+/* ============ BACKEND: Apps Script ou demonstração local ============ */
+let PIN='',D=null,FILA=[],TAB='hoje',CARR=false,ENV=false;
+const DEMO_USERS={'1234':{nome:'Manuel',papel:'admin'},'5678':{nome:'Sócio',papel:'admin'},'1111':{nome:'Equipe',papel:'equipe'}};
+function demoSeed(){const cli={id:'c1',nome:'João',tel:'11999999999',preco:0.4,fora:false,chave:'joao01'},cli2={id:'c2',nome:'Thaty',tel:'',preco:0.4,fora:false,chave:'thaty01'};
+  const ago=h=>new Date(Date.now()-h*3600000).toISOString();
+  return{config:{empresa:'Logari Corte',diaria:400,preco:0.4,socio:'Sócio'},clientes:[cli,cli2],
+  cortes:[{id:'k1',cod:'C-001',cli:'c1',data:hoje(),modelo:'Mula Manca',ref:'01',aprov:84.5,comp:9.8,larg:1.6,enc:{R1:10,R3:7},ret:{R1:2},retComp:1,packs:2,preco:0.4,
+    cores:[{cor:'Preto',rolos:5,folhas:50,fret:5},{cor:'Marrom',rolos:5,folhas:49,fret:4},{cor:'Marfim',rolos:3,folhas:30,fret:3}],foto:'',obs:'',
+    log:[{id:'l1',e:'pedido',t:'i',em:ago(30),por:'Manuel'},{id:'l2',e:'pedido',t:'f',em:ago(29),por:'Manuel'},{id:'l3',e:'descanso',t:'i',em:ago(26),por:'Equipe'},{id:'l4',e:'descanso',t:'f',em:ago(3),por:'Equipe'},{id:'l5',e:'infesto',t:'i',em:ago(2),por:'Equipe'}],
+    ocorr:[],pags:[]}],despesas:[]}}
+function demoDB(){let d=null;try{d=JSON.parse(getStore('cor_demo'))}catch(e){}if(!d){d=demoSeed();store('cor_demo',JSON.stringify(d))}return d}
+function fotosLocal(){try{return JSON.parse(getStore('cor_fotos')||'{}')}catch(e){return{}}}
+function local(action,p){const db=demoDB();
+  if(action==='portal'){const c=db.clientes.find(x=>x.chave===p.chave);if(!c)throw new Error('Link inválido');return{data:portalDe(db,c)}}
+  if(action==='fotoGet')return{b64:fotosLocal()[p.id]||''};
+  const u=DEMO_USERS[PIN];if(!u)throw new Error('PIN inválido');
+  if(action==='login')return{user:u};
+  if(action==='dados')return{data:visao(db,u)};
+  if(action==='foto'){const id='f'+uid(),F=fotosLocal();F[id]=p.b64;try{localStorage.setItem('cor_fotos',JSON.stringify(F))}catch(e){throw new Error('Memória do aparelho cheia')}return{id}}
+  pode(u,action,p);opera(db,action,p);store('cor_demo',JSON.stringify(db));return{msg:'Salvo'}}
+async function post(action,p){
+  if(DEMO){await new Promise(r=>setTimeout(r,60));return Object.assign({ok:true},local(action,p||{}))}
+  const r=await fetch(API,{method:'POST',body:JSON.stringify({pin:PIN,action,p:p||{}}),redirect:'follow'});const j=await r.json();if(!j||!j.ok)throw new Error(j?j.erro:'Erro');return j}
+async function call(action,p,quiet){if(!quiet)loading(true);try{return await post(action,p)}catch(e){if(/Failed to fetch|NetworkError|Load failed|JSON/.test(e.message))throw new Error('Sem conexão. Tente de novo.');throw e}finally{if(!quiet)loading(false)}}
+function sync(on){const e=$('#sync');if(e)e.className='sync'+(on?' on':'')}
+const CK=()=>'cor_d_'+PIN;
+
+async function entrar(){PIN=$('#pin').value.trim();if(!PIN)return;
+  try{FILA=JSON.parse(getStore('cor_fila_'+PIN)||'[]')}catch(e){FILA=[]}
+  const cache=getStore(CK());
+  if(cache){try{store('cor_pin',PIN);abrir();setD(JSON.parse(cache),true);carregar();return}catch(e){}}
+  try{await call('login');store('cor_pin',PIN);abrir();carregar()}catch(e){$('#lerr').textContent=e.message;if(/PIN/.test(e.message))store('cor_pin')}}
+function sair(){if(!confirm('Sair deste aparelho?'))return;store('cor_pin');store(CK());location.reload()}
+function abrir(){$('#login').style.display='none';$('#app').style.display='block';history.replaceState({t:TAB},'')}
+let RAW=null;
+async function carregar(force){if(CARR)return;CARR=true;sync(true);if(!D)loading(true);
+  try{const r=await call('dados',{},true);RAW=r.data;store(CK(),JSON.stringify(RAW));monta();render();if(force)toast('Atualizado')}
+  catch(e){if(/PIN/.test(e.message)){store('cor_pin');store(CK());location.reload();return}if(!D)toast(e.message);else if(force)toast('Sem sinal — usando os dados do celular')}
+  finally{CARR=false;loading(false);sync(FILA.length>0);if(FILA.length)processaFila()}}
+function setD(d){RAW=d;monta();render()}
+function monta(){D=JSON.parse(JSON.stringify(RAW));D.config=D.config||{};FILA.forEach(it=>{try{opera(D,it.a,it.p)}catch(e){}});
+  $('#sub').textContent=(D.user?D.user.nome:'')+(DEMO?' · demonstração':'')}
+const ADM=()=>D&&D.user&&D.user.papel==='admin';
+function salvaFila(){store('cor_fila_'+PIN,JSON.stringify(FILA))}
+async function processaFila(){if(ENV||!FILA.length)return;ENV=true;sync(true);
+  while(FILA.length){const it=FILA[0];let r;try{r=await call(it.a,Object.assign({},it.p,{_id:it.id}),true)}catch(e){if(/Sem conexão/.test(e.message))break;r={ok:false,erro:e.message}}
+    FILA.shift();salvaFila();if(!r.ok)toast('Não salvou: '+r.erro)}
+  ENV=false;sync(FILA.length>0);if(!FILA.length)carregar()}
+window.addEventListener('online',()=>{if(FILA.length)processaFila();else if(D)carregar()});
+function acao(a,p,fechar=true){const it={id:uid(),a,p};FILA.push(it);salvaFila();if(fechar)close_();monta();render();if(SHEETFN)SHEETFN();
+  toast(navigator.onLine?'Salvo':'Salvo no celular · envia quando tiver sinal');processaFila()}
+function vFila(){if(!FILA.length)return'';return`<div class="fila"><span>${FILA.length} lançamento${FILA.length>1?'s':''} ${navigator.onLine?'sendo enviado…':'aguardando sinal (já está salvo no celular)'}</span>${navigator.onLine?`<button onclick="processaFila()">Enviar</button>`:''}</div>`}
+
+/* ============ NAVEGAÇÃO ============ */
+const IC={hoje:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+ cortes:'<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/></svg>',
+ clientes:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.2 2.5 3.6 5.2"/></svg>',
+ caixa:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/></svg>'};
+function ir(t){TAB=t;history.pushState({t},'');render();scrollTo(0,0)}
+window.addEventListener('popstate',e=>{if($('.sheet')){close_(true);history.pushState({t:TAB},'');return}TAB=(e.state&&e.state.t)||'hoje';render()});
+function render(){if(!D)return;
+  const tabs=[['hoje','Hoje'],['cortes','Cortes'],['clientes','Clientes']];if(ADM())tabs.push(['caixa','Caixa']);
+  $('#nav').innerHTML=tabs.map(([k,n])=>`<button class="${TAB===k?'on':''}" onclick="ir('${k}')">${IC[k]}${n}</button>`).join('');
+  const V={hoje:vHoje,cortes:vCortes,clientes:vClientes,caixa:vCaixa}[TAB]||vHoje;
+  $('#main').innerHTML=(DEMO?'<div class="demo">Modo demonstração — os dados ficam só neste aparelho. PINs: 1234 (Manuel), 5678 (sócio), 1111 (equipe).</div>':'')+vFila()+V();
+  const fab={hoje:['+ Corte','fCorte()'],cortes:['+ Corte','fCorte()'],clientes:['+ Cliente','fCliente()'],caixa:['+ Despesa','fDespesa()']}[TAB];
+  $('#fabw').innerHTML=ADM()&&fab?`<button class="fab" onclick="${fab[1]}">${fab[0]}</button>`:''}
+let SHEETFN=null;
+function open_(html,fn){close_(true);const s=document.createElement('div');s.className='sheet';s.innerHTML=`<div>${html}</div>`;s.onclick=e=>{if(e.target===s)close_()};document.body.appendChild(s);SHEETFN=fn||null;history.pushState({t:TAB,s:1},'');carregaFotos()}
+function reopen(html){const s=$('.sheet>div');if(!s)return;const y=s.scrollTop;s.innerHTML=html;s.scrollTop=y;carregaFotos()}
+function close_(nohist){const s=$('.sheet');if(s)s.remove();SHEETFN=null}
+
+/* ============ HELPERS DE DADOS ============ */
+const cliDe=id=>(D.clientes||[]).find(c=>c.id===id)||{nome:'?'};
+const corteDe=id=>(D.cortes||[]).find(c=>c.id===id);
+function proxCod(){const m=(D.cortes||[]).reduce((s,c)=>Math.max(s,+(String(c.cod||'').replace(/\D/g,''))||0),0);return'C-'+String(m+1).padStart(3,'0')}
+function ordena(L){return L.slice().sort((a,b)=>(b.data||'').localeCompare(a.data||'')||(b.cod||'').localeCompare(a.cod||''))}
+
+/* ============ VIEW: HOJE ============ */
+function cardCorte(c,btn=true){const k=calc(c),s=status(c),cl=cliDe(c.cli),p=proxima(c);
+  let b='';if(btn&&!c.retirado){if(pendOc(c).length)b='';else if(p)b=`<button class="btn sm ${p.t==='f'?'':'sec'}" onclick="event.stopPropagation();marca('${c.id}','${p.e}','${p.t}')">${p.t==='f'?'Finalizar':'Iniciar'} ${esc(ETN[p.e].split(' ')[0])}</button>`;
+    else if(ADM())b=`<button class="btn sm sec" onclick="event.stopPropagation();retirar('${c.id}')">Retirado</button>`}
+  const saldo=ADM()&&k.saldo>0.01&&k.valor>0?`<span class="pill ${c.retirado?'bad':'pe'}">a receber ${brl(k.saldo)}</span>`:'';
+  return`<div class="item" onclick="detCorte('${c.id}')"><div class="row sp"><b>${esc(c.cod)} · ${esc(cl.nome)}</b><span class="pill ${s.k}">${esc(s.t)}</span></div>
+  <div class="row sp" style="margin-top:4px"><span class="mut">${esc(c.modelo||'')}${c.ref?' · '+esc(c.ref):''} · ${dbr(c.data)} · ${k.total?n0(k.total)+' pç':n0(k.rolos)+' rolos'}</span></div>
+  ${b||saldo?`<div class="row sp" style="margin-top:8px">${saldo||'<span></span>'}${b}</div>`:''}</div>`}
+function vHoje(){const at=ordena(D.cortes.filter(c=>!c.retirado));
+  const ocs=at.filter(c=>pendOc(c).length),and=at.filter(c=>!pendOc(c).length&&proxima(c)),pr=at.filter(c=>!pendOc(c).length&&!proxima(c));
+  let h='';
+  const hj=D.cortes.filter(c=>c.data===hoje()),pcH=hj.reduce((s,c)=>s+calc(c).total,0);
+  h+=`<div class="grid3" style="margin-bottom:10px"><div class="st"><span class="k">Em produção</span><b>${and.length}</b></div><div class="st"><span class="k">Prontos</span><b>${pr.length}</b></div><div class="st"><span class="k">Peças hoje</span><b>${n0(pcH)}</b></div></div>`;
+  if(ADM()){const ar=D.cortes.map(c=>calc(c)).filter(k=>k.saldo>0.01&&k.valor>0).reduce((s,k)=>s+k.saldo,0);if(ar>0)h+=`<div class="card alert row sp" onclick="ir('caixa')"><span>A receber dos cortes</span><b class="mid">${brl(ar)}</b></div>`}
+  if(ocs.length)h+=`<div class="k" style="margin:14px 0 6px">⚠ Ocorrências aguardando o cliente</div>`+ocs.map(c=>cardCorte(c)).join('');
+  h+=`<div class="k" style="margin:14px 0 6px">Em produção</div>`+(and.length?and.map(c=>cardCorte(c)).join(''):'<div class="empty">Nenhum corte em andamento</div>');
+  if(pr.length)h+=`<div class="k" style="margin:14px 0 6px">Prontos para retirar</div>`+pr.map(c=>cardCorte(c)).join('');
+  return h}
+/* ============ VIEW: CORTES ============ */
+let FC={f:'ativos',q:''};
+function vCortes(){const f=FC.f,q=FC.q.toLowerCase();
+  let L=D.cortes.filter(c=>f==='todos'||(f==='ativos'&&!c.retirado&&proxima(c))||(f==='prontos'&&!c.retirado&&!proxima(c))||(f==='retirados'&&c.retirado));
+  if(q)L=L.filter(c=>(cliDe(c.cli).nome+' '+c.cod+' '+c.modelo).toLowerCase().includes(q));
+  return`<div class="chips">${[['ativos','Em produção'],['prontos','Prontos'],['retirados','Retirados'],['todos','Todos']].map(([k,n])=>`<button class="${f===k?'on':''}" onclick="FC.f='${k}';render()">${n}</button>`).join('')}</div>
+  <input placeholder="Buscar cliente, código ou modelo" value="${esc(FC.q)}" oninput="FC.q=this.value;clearTimeout(window._q);window._q=setTimeout(()=>{render();const i=$('main input');i.focus();i.setSelectionRange(99,99)},250)" style="margin-bottom:10px">
+  ${L.length?ordena(L).map(c=>cardCorte(c)).join(''):'<div class="empty">Nada por aqui</div>'}`}
+
+/* ============ DETALHE DO CORTE ============ */
+function marca(id,e,t){const c=corteDe(id);if(!c)return;
+  if(e==='corte'&&t==='i'&&!calc(c).folhas&&!confirm('As folhas ainda não foram lançadas. Iniciar o corte mesmo assim?'))return;
+  acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t,em:new Date().toISOString(),por:D.user.nome}},false);
+  if(e==='infesto'&&t==='f')setTimeout(()=>fFolhas(id),300)}
+function pular(id,e){if(!confirm(`Marcar "${ETN[e]}" como feito (sem horário)?`))return;const em=new Date().toISOString();
+  acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t:'f',em,por:D.user.nome,pulo:1}},false)}
+function retirar(id){const c=corteDe(id);acao('set',{tab:'cortes',id,campo:'retirado',valor:c.retirado?'':hoje()},false)}
+function detCorte(id){open_(htmlCorte(id),()=>{if(corteDe(id))reopen(htmlCorte(id));else close_()});carregaFotos(id)}
+function htmlCorte(id){const c=corteDe(id);if(!c)return'';const k=calc(c),cl=cliDe(c.cli),s=status(c),adm=ADM();
+  let h=`<div class="row sp"><h2>${esc(c.cod)} · ${esc(cl.nome)}</h2><span class="pill ${s.k}">${esc(s.t)}</span></div>
+  <div class="mut">${esc(c.modelo||'')}${c.ref?' · risco '+esc(c.ref):''} · ${dbrY(c.data)}${c.retirado?' · retirado '+dbr(c.retirado):''}</div>
+  <div class="grid3" style="margin-top:12px"><div class="st"><span class="k">Peças</span><b>${n0(k.total)}</b></div><div class="st"><span class="k">Folhas</span><b>${n0(k.folhas)}</b></div><div class="st"><span class="k">Rolos</span><b>${n0(k.rolos)}</b></div></div>`;
+  if(adm)h+=`<div class="grid3" style="margin-top:8px"><div class="st"><span class="k">Valor</span><b style="font-size:17px">${brl(k.valor)}</b></div><div class="st"><span class="k">Pago</span><b style="font-size:17px">${brl(k.pago)}</b></div><div class="st"><span class="k">Saldo</span><b style="font-size:17px;color:${k.saldo>0.01?'var(--warn)':'var(--ok)'}">${brl(k.saldo)}</b></div></div>`;
+  // etapas
+  h+=`<h3>Etapas</h3>`+ETAPAS.map(([e,n])=>{const st=etSt(c,e);let info='',b='';
+    if(st.ok)info=st.f.pulo?'feito':(st.i?hm(st.i.em)+' – '+hm(st.f.em)+' · '+dur(st.i.em,st.f.em)+' · '+esc(st.i.por):dhm(st.f.em))+(st.f.por&&st.i&&st.f.por!==st.i.por?' / '+esc(st.f.por):'');
+    else if(st.on)info='desde '+dhm(st.i.em)+' ('+dur(st.i.em,new Date().toISOString())+') · '+esc(st.i.por);
+    if(!c.retirado){if(st.on)b=`<button class="btn sm" onclick="marca('${id}','${e}','f')">Finalizar</button>`;else if(!st.ok)b=`<button class="btn sm sec" onclick="marca('${id}','${e}','i')">Iniciar</button>`+(adm?`<button class="x" style="color:var(--mut);font-size:13px" onclick="pular('${id}','${e}')">pular</button>`:'')}
+    return`<div class="et"><div><span class="nm" style="color:${st.ok?'var(--ok)':st.on?'var(--warn)':'var(--ink)'}">${st.ok?'✓ ':st.on?'▶ ':''}${n}</span><small>${info||'—'}</small></div><div class="row">${b}</div></div>`}).join('');
+  // ocorrências
+  const oc=c.ocorr||[];
+  h+=`<h3>Inspeção do tecido</h3>`+(oc.length?oc.map(o=>`<div class="card ${o.aut?'':o.neg?'alert bad':'alert'}" style="padding:10px">
+     <div class="row sp"><b>${esc(o.desc||'Ocorrência')}</b><span class="pill ${o.aut?'ok':o.neg?'bad':'warn'}">${o.aut?'autorizado '+dbr(o.aut):o.neg?'não autorizado':'aguardando'}</span></div>
+     <div class="mut" style="font-size:12px">${dhm(o.em)} · ${esc(o.por||'')}</div>
+     <div class="thumbs">${(o.fotos||[]).map(f=>`<img data-foto="${esc(f)}" onclick="verFoto('${esc(f)}')">`).join('')}</div>
+     ${adm&&!o.aut&&!o.neg?`<div class="row" style="margin-top:8px;gap:6px"><button class="btn sm wa" onclick="enviaOc('${id}','${o.id}')">Enviar ao cliente</button><button class="btn sm" onclick="autoriza('${id}','${o.id}',1)">Autorizou</button><button class="btn sm bad" onclick="autoriza('${id}','${o.id}',0)">Não</button></div>`:''}</div>`).join(''):'<div class="mut" style="font-size:13px">Nenhuma ocorrência registrada.</div>')
+    +(c.retirado?'':`<button class="btn sec" onclick="fOcorr('${id}')">Registrar ocorrência (foto)</button>`);
+  // risco
+  h+=`<h3>Risco</h3><table>
+    <tr><td>Modelo</td><td>${esc(c.modelo||'—')} ${c.ref?'· ref '+esc(c.ref):''}</td></tr>
+    <tr><td>Aproveitamento</td><td>${c.aprov?n1(c.aprov)+'%':'—'}</td></tr>
+    <tr><td>Comprimento × largura</td><td>${c.comp?n1(c.comp)+' m':'—'} × ${c.larg?n1(c.larg)+' m':'—'}</td></tr>
+    <tr><td>Encaixes</td><td>${k.T.filter(t=>+(c.enc||{})[t]).map(t=>c.enc[t]+' '+t).join(' + ')||'—'} ${k.encT?'= '+k.encT:''}</td></tr>
+    ${k.retT?`<tr><td>Risco de retalho</td><td>${c.retComp?n1(c.retComp)+' m · ':''}${k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+' '+t).join(' + ')} = ${k.retT}</td></tr>`:''}
+  </table>${c.foto?`<img class="ft" data-foto="${esc(c.foto)}" onclick="verFoto('${esc(c.foto)}')">`:''}`;
+  // tecido e peças
+  h+=`<h3>Tecido e peças</h3>`;
+  if(k.cores.length){h+=`<table><tr><th>Cor</th><th>Rolos</th><th>Folhas</th>${k.retT?'<th>Ret.</th>':''}${k.T.map(t=>`<th>${esc(t)}</th>`).join('')}<th>Total</th></tr>
+    ${k.cores.map(x=>`<tr><td>${dot(x.cor)} ${esc(x.cor)}</td><td>${x.rolos}</td><td>${x.folhas||'<span class="mut">—</span>'}</td>${k.retT?`<td>${x.fret||'<span class="mut">—</span>'}</td>`:''}${k.T.map(t=>`<td>${n0(x.p[t])}</td>`).join('')}<td><b>${n0(x.tot)}</b></td></tr>`).join('')}
+    <tr class="tot"><td>Total</td><td>${k.rolos}</td><td>${k.folhas}</td>${k.retT?`<td>${k.fret}</td>`:''}${k.T.map(t=>`<td>${n0(k.porT[t])}</td>`).join('')}<td>${n0(k.total)}</td></tr></table>
+    ${k.retalho?`<div class="hint">Inclui ${n0(k.retalho)} peças do retalho (${k.fret} folhas × ${k.retT}).</div>`:''}`}
+  h+=`<button class="btn ${k.folhas?'sec':''}" onclick="fFolhas('${id}')">${k.folhas?'Corrigir folhas':'Lançar folhas por cor'}</button>`;
+  const sq=seqHtml(c.cores);if(sq)h+=`<h3>Ordem do infesto</h3>${sq}`;
+  // embalagem
+  if(k.folhas){const am=etSt(c,'amarracao').ok;h+=`<h3>Embalagem</h3>`;
+   if(!am&&!c.packs)h+=`<div class="mut" style="font-size:13px">Os packs por saco são definidos depois da amarração.</div>`;
+   else h+=`<div class="lin"><span class="nm"><b>Packs por saco</b></span><div class="step"><button onclick="setPacks('${id}',${(+c.packs||1)-1})">−</button><input inputmode="numeric" value="${c.packs||0}" onchange="setPacks('${id}',num(this.value))"><button onclick="setPacks('${id}',${(+c.packs||0)+1})">+</button></div></div>`}
+  if(k.sacos.length){h+=`<div class="mut" style="font-size:13px;margin-bottom:6px">${k.sacos.length} sacos · ${c.packs} packs por saco · ${k.folhas} peças por pack${k.fret?' · retalho '+k.fret+' por pack':''}</div>
+    <table><tr><th>Saco</th><th>Tamanho</th><th>Packs</th><th>Peças</th></tr>${k.sacos.map(s=>`<tr><td>${s.n}</td><td>${esc(s.tam)}${s.ret?' <span class="pill">retalho</span>':''}</td><td>${s.packs}</td><td>${n0(s.pecas)}</td></tr>`).join('')}</table>
+    <button class="btn sec" onclick="etiquetas('${id}')">Imprimir etiquetas dos sacos</button>`}
+  // pagamento
+  if(adm){h+=`<h3>Pagamento</h3><div class="mut" style="font-size:13px">${n0(k.total)} peças × ${brl(k.preco)} = <b class="acc">${brl(k.valor)}</b></div>`
+    +((c.pags||[]).length?`<table style="margin-top:6px">${c.pags.map(p=>`<tr><td>${dbr(p.data)} · ${esc(p.forma||'')}</td><td>${brl(p.valor)} <button class="x" onclick="rmPag('${id}','${p.id}')">×</button></td></tr>`).join('')}</table>`:'')
+    +(k.saldo>0.01?`<button class="btn" onclick="fPag('${id}')">Registrar pagamento</button><button class="btn wa" onclick="cobrar('${id}')">Cobrar no WhatsApp</button>`:'')}
+  h+=`<h3>Cliente</h3><button class="btn" onclick="pdfCliente('${id}')">PDF do corte para o cliente</button>`;
+  if(adm)h+=`<button class="btn sec" onclick="retirar('${id}')">${c.retirado?'Desfazer retirada':'Marcar como retirado'}</button>
+    <button class="btn sec" onclick="fCorte('${id}')">Editar corte</button><button class="btn bad" onclick="excluiCorte('${id}')">Excluir corte</button>`;
+  return h}
+function setPacks(id,v){v=Math.max(0,Math.round(+v||0));acao('set',{tab:'cortes',id,campo:'packs',valor:v},false)}
+function excluiCorte(id){const c=corteDe(id);if(!confirm(`Excluir o corte ${c.cod}? Isso não tem volta.`))return;acao('del',{tab:'cortes',id})}
+
+/* ============ FOTOS ============ */
+const FOTOS={};
+function reduzir(file,M=1400,q=.8){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>{const sc=Math.min(1,M/Math.max(img.width,img.height));const cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(img.src);res(cv.toDataURL('image/jpeg',q))};img.onerror=rej;img.src=URL.createObjectURL(file)})}
+async function sobeFoto(b64){const r=await call('foto',{b64},true);FOTOS[r.id]=b64;return r.id}
+async function getFoto(id){if(!id)return'';if(FOTOS[id])return FOTOS[id];try{const r=await call('fotoGet',{id,chave:PORTAL||''},true);if(r.b64)FOTOS[id]=r.b64;return r.b64||''}catch(e){return''}}
+function carregaFotos(){document.querySelectorAll('img[data-foto]').forEach(async im=>{const b=await getFoto(im.dataset.foto);if(b)im.src=b})}
+async function verFoto(id){const b=await getFoto(id);if(!b)return;const w=document.createElement('div');w.className='load';w.style.zIndex=70;w.innerHTML=`<img src="${b}" style="max-width:100%;max-height:100%">`;w.onclick=()=>w.remove();document.body.appendChild(w)}
+
+/* ============ FORM: CORTE ============ */
+let FORM=null;
+function fCorte(id){const c=id?corteDe(id):null,cfg=D.config;
+  FORM=c?JSON.parse(JSON.stringify(c)):{id:uid(),cod:proxCod(),cli:'',data:hoje(),modelo:'',ref:'',aprov:'',comp:'',larg:'',enc:{R1:0,R3:0},ret:{},packs:0,preco:'',cores:[],foto:'',obs:'',log:[],ocorr:[],pags:[]};
+  FORM._tams=c?Object.keys(Object.assign({},c.enc,c.ret)):['R1','R3'];FORM._novo=!c;FORM._fotoB64='';FORM._ret=c?Object.values(c.ret||{}).some(v=>+v):false;FORM.ret=FORM.ret||{};
+  open_(htmlForm());carregaFotos()}
+function htmlForm(){const F=FORM,adm=ADM(),k=calc(Object.assign({},F,{enc:pick(F.enc),ret:F._ret?pick(F.ret):{}}));
+  const cls=(D.clientes||[]).slice().sort((a,b)=>a.nome.localeCompare(b.nome));
+  return`<h2>${F._novo?'Novo corte':'Editar '+esc(F.cod)}</h2><div class="mut">${esc(F.cod)}</div>
+  <label>Cliente</label><select onchange="FORM.cli=this.value;if(this.value!=='__novo'){const c=cliDe(this.value);if(c.preco!=null&&FORM._novo)FORM.preco=c.preco}reopen(htmlForm())">
+    <option value="">Escolha…</option>${cls.map(c=>`<option value="${c.id}" ${F.cli===c.id?'selected':''}>${esc(c.nome)}</option>`).join('')}<option value="__novo" ${F.cli==='__novo'?'selected':''}>+ Novo cliente</option></select>
+  ${F.cli==='__novo'?`<label>Nome do novo cliente</label><input value="${esc(F._nnome||'')}" oninput="FORM._nnome=this.value"><label>WhatsApp</label><input inputmode="tel" value="${esc(F._ntel||'')}" oninput="FORM._ntel=this.value">`:''}
+  <label>Data do corte</label><input type="date" value="${F.data}" onchange="FORM.data=this.value">
+  <h3>Risco</h3>
+  <button class="btn sec" onclick="$('#frisco').click()">📷 Foto do risco (lê os dados sozinho)</button>
+  <input id="frisco" type="file" accept="image/*" style="display:none" onchange="lerRisco(this.files[0])">
+  ${F._fotoB64?`<img class="ft" src="${F._fotoB64}">`:F.foto?`<img class="ft" data-foto="${esc(F.foto)}">`:''}
+  <div class="grid2"><div><label>Modelo (nome interno)</label><input value="${esc(F.modelo)}" oninput="FORM.modelo=this.value"></div><div><label>Ref. do risco</label><input value="${esc(F.ref)}" oninput="FORM.ref=this.value"></div></div>
+  <div class="grid3"><div><label>Aprov. %</label><input inputmode="decimal" value="${F.aprov}" oninput="FORM.aprov=num(this.value)"></div><div><label>Compr. m</label><input inputmode="decimal" value="${F.comp}" oninput="FORM.comp=num(this.value)"></div><div><label>Largura m</label><input inputmode="decimal" value="${F.larg}" oninput="FORM.larg=num(this.value)"></div></div>
+  <label>Encaixes por tamanho</label>
+  ${F._tams.map((t,i)=>`<div class="lin"><span class="nm"><b>${esc(t)}</b></span><div class="row">${stepper('enc',t)}<button class="x" onclick="FORM._tams.splice(${i},1);delete FORM.enc['${esc(t)}'];delete FORM.ret['${esc(t)}'];reopen(htmlForm())">×</button></div></div>`).join('')}
+  ${F._addT?`<div class="card" style="padding:10px"><div class="row wrap" style="gap:6px">${['R1','R2','R3','R4','P','M','G','GG','U'].filter(t=>!F._tams.includes(t)).map(t=>`<button class="btn sm sec" onclick="addTam('${t}')">${t}</button>`).join('')}<button class="btn sm sec" onclick="addTam(prompt('Nome do tamanho'))">Outro…</button></div></div>`
+   :`<button id="addT" class="btn sm sec" style="font-size:22px;padding:4px 18px" onclick="FORM._addT=1;reopen(htmlForm())">+</button>`}
+  <label class="row" style="margin-top:14px;gap:10px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink)"><input type="checkbox" style="width:22px;height:22px;accent-color:var(--acc)" ${F._ret?'checked':''} onchange="FORM._ret=this.checked;reopen(htmlForm())"> Tem risco de retalho</label>
+  <div class="hint">Risco principal: ${k.encT} peças por folha.</div>
+  ${F._ret?`<div class="card" style="margin-top:10px"><div class="k">Risco de retalho (corte secundário)</div><div class="hint">Mini risco para a sobra dos rolos. Tem folhas próprias, lançadas depois.</div>
+   <label>Comprimento do retalho m</label><input inputmode="decimal" value="${F.retComp||''}" placeholder="1" oninput="FORM.retComp=num(this.value)">
+   <label>Encaixes no retalho</label>${F._tams.map(t=>`<div class="lin"><span class="nm"><b>${esc(t)}</b></span>${stepper('ret',t)}</div>`).join('')}
+   <div class="hint">Retalho: ${k.retT} peças por folha.</div></div>`:''}
+  <h3>Tecido</h3>
+  ${F.cores.map((x,i)=>`<div class="lin"><span class="nm">${dot(x.cor)}<b>${esc(x.cor)}</b></span><div class="row"><span class="mut" style="font-size:11px">rolos</span>${stepper('cor',i,'rolos')}<button class="x" onclick="FORM.cores.splice(${i},1);reopen(htmlForm())">×</button></div></div>`).join('')}
+  ${F._pick?htmlPick():`<button class="btn sec" onclick="abrePick()">+ Cores</button>`}
+  ${F.cores.length>1?`<div class="hint" style="margin:8px 0 4px">Ordem do infesto:</div>${seqHtml(F.cores)}`:''}
+  <div class="hint">As folhas de cada cor são lançadas depois do infesto.</div>
+  ${adm?`<h3>Preço</h3><label>Preço por peça R$</label><input inputmode="decimal" value="${m2(F.preco)}" placeholder="${m2(D.config.preco||0.4)}" oninput="FORM.preco=num(this.value)" onblur="this.value=m2(FORM.preco)">`:''}
+  <label>Observação</label><input value="${esc(F.obs||'')}" oninput="FORM.obs=this.value">
+  <button class="btn" onclick="salvaCorte()">Salvar corte</button>`}
+function addTam(v){v=String(v||'').trim().toUpperCase();FORM._addT=0;if(v&&!FORM._tams.includes(v))FORM._tams.push(v);reopen(htmlForm())}
+function pick(o){const r={};FORM._tams.forEach(t=>{if(+o[t])r[t]=+o[t]});return r}
+function stepper(kind,key,campo){const get=()=>kind==='cor'?FORM.cores[key][campo]:(FORM[kind][key]||0);const ref=kind==='cor'?`FORM.cores[${key}].${campo}`:`FORM.${kind}['${key}']`;
+  return`<div class="step"><button onclick="${ref}=Math.max(0,(+${ref}||0)-1);reopen(htmlForm())">−</button><input inputmode="numeric" value="${get()||0}" onchange="${ref}=num(this.value);reopen(htmlForm())"><button onclick="${ref}=(+${ref}||0)+1;reopen(htmlForm())">+</button></div>`}
+function coresDoCli(id){const s=[];(D.cortes||[]).filter(c=>c.cli===id).forEach(c=>(c.cores||[]).forEach(x=>{if(!s.includes(x.cor))s.push(x.cor)}));return s}
+function abrePick(){const hab=coresDoCli(FORM.cli);FORM._pick={sel:[],todas:!hab.length};reopen(htmlForm())}
+function htmlPick(){const P=FORM._pick,hab=coresDoCli(FORM.cli),usadas=FORM.cores.map(x=>x.cor);
+  let L=P.todas?Object.keys(CORES).concat(hab.filter(c=>!CORES[c])):hab;L=L.filter(c=>!usadas.includes(c));P.sel.forEach(c=>{if(!L.includes(c))L.push(c)});
+  return`<div class="card" style="padding:10px"><div class="k" style="margin-bottom:8px">Toque nas cores do corte</div><div class="row wrap" style="gap:6px">
+   ${L.map(c=>`<button class="btn sm ${P.sel.includes(c)?'':'sec'}" onclick="togCor('${esc(c)}')">${dot(c)} ${esc(c)}</button>`).join('')}
+   ${P.todas?`<button class="btn sm sec" onclick="togCor(prompt('Nome da cor'))">Outra…</button>`:`<button class="btn sm sec" onclick="FORM._pick.todas=1;reopen(htmlForm())">+ Outra cor</button>`}</div>
+   <div class="grid2"><button class="btn sec" onclick="FORM._pick=null;reopen(htmlForm())">Cancelar</button><button class="btn" onclick="okCores()">OK${P.sel.length?' ('+P.sel.length+')':''}</button></div></div>`}
+function togCor(c){c=String(c||'').trim();if(!c)return;c=c[0].toUpperCase()+c.slice(1);const S=FORM._pick.sel,i=S.indexOf(c);i>=0?S.splice(i,1):S.push(c);reopen(htmlForm())}
+function okCores(){FORM._pick.sel.forEach(c=>{if(!FORM.cores.some(x=>x.cor===c))FORM.cores.push({cor:c,rolos:1,folhas:0})});FORM._pick=null;reopen(htmlForm())}
+async function salvaCorte(){const F=FORM;
+  if(!F.cli)return toast('Escolha o cliente');
+  if(F.cli==='__novo'){const nm=(F._nnome||'').trim();if(!nm)return toast('Nome do cliente');const c={id:uid(),nome:nm,tel:(F._ntel||'').replace(/\D/g,''),preco:D.config.preco||0.4,fora:false,chave:chave()};acao('put',{tab:'clientes',rec:c},false);F.cli=c.id}
+  if(!F.modelo)return toast('Informe o modelo');
+  if(!Object.keys(pick(F.enc)).length)return toast('Informe os encaixes');
+  if(!F.cores.length)return toast('Adicione as cores do tecido');
+  if(F._fotoB64){try{loading(true,'Enviando foto…');F.foto=await sobeFoto(F._fotoB64)}catch(e){toast('Foto não subiu (sem sinal?) — salvei sem a foto')}finally{loading(false)}}
+  if(F.preco===''||F.preco==null)F.preco=+(cliDe(F.cli).preco??D.config.preco??0.4);
+  const rec=Object.assign({},F,{enc:pick(F.enc),ret:F._ret?pick(F.ret):{},retComp:F._ret?(F.retComp||''):''});Object.keys(rec).filter(x=>x[0]==='_').forEach(x=>delete rec[x]);
+  const novo=F._novo;acao('put',{tab:'cortes',rec});if(novo)setTimeout(()=>detCorte(rec.id),200)}
+function chave(){return Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6)}
+
+/* ============ LEITURA DO RISCO POR FOTO (OCR no aparelho) ============ */
+function loadScript(src){return new Promise((ok,er)=>{if(document.querySelector(`script[src="${src}"]`))return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>er(new Error('Sem conexão para carregar o leitor'));document.head.appendChild(s)})}
+async function lerRisco(file){if(!file)return;try{FORM._fotoB64=await reduzir(file,1400,.8)}catch(e){return toast('Foto inválida')}reopen(htmlForm());
+  try{loading(true,'Lendo o risco…');await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+    const big=await reduzir(file,2400,.92);const r=await Tesseract.recognize(big,'por');const o=parseRisco(r.data.text||'');let n=0;
+    ['modelo','ref','aprov','comp','larg'].forEach(k=>{if(o[k]!=null&&o[k]!==''){FORM[k]=o[k];n++}});
+    if(o.enc&&Object.keys(o.enc).length){FORM.enc=o.enc;FORM._tams=Object.keys(o.enc);n++}
+    toast(n?'Li '+n+' campo'+(n>1?'s':'')+' — confira':'Não consegui ler — preencha à mão')}
+  catch(e){toast(e.message)}finally{loading(false);reopen(htmlForm())}}
+function parseRisco(t){const o={},T=t.replace(/\r/g,'');const f=re=>{const m=T.match(re);return m?num(m[1]):null};
+  o.aprov=f(/(?:aproveit|efici)\w*[^\d\n]{0,15}(\d{1,3}(?:[.,]\d+)?)\s*%?/i);
+  o.comp=f(/compr\w*[^\d\n]{0,15}(\d{1,3}(?:[.,]\d+)?)/i);
+  o.larg=f(/larg\w*[^\d\n]{0,15}(\d(?:[.,]\d+)?)/i);
+  if(o.comp>100)o.comp=o.comp/100;if(o.larg>10)o.larg=o.larg/100;
+  let m=T.match(/ref\w*\.?\s*(?:do risco)?\s*[:\-]?\s*([A-Za-z0-9\-\/]{1,12})/i);if(m)o.ref=m[1];
+  m=T.match(/(?:modelo|produto|nome)\s*[:\-]\s*([^\n]{2,40})/i);if(m)o.modelo=m[1].trim();
+  const enc={};let r;const re=/\b(R\d|PP|GG|P|M|G|U)\b\s*[:xX×=\-]\s*(\d{1,2})\b/g;while((r=re.exec(T)))enc[r[1].toUpperCase()]=(enc[r[1].toUpperCase()]||0)+(+r[2]);
+  const re2=/\b(\d{1,2})\s*[xX×]?\s*(R\d)\b/g;if(!Object.keys(enc).length)while((r=re2.exec(T)))enc[r[2].toUpperCase()]=(enc[r[2].toUpperCase()]||0)+(+r[1]);
+  if(Object.keys(enc).length)o.enc=enc;return o}
+
+/* ============ FOLHAS, OCORRÊNCIA, PAGAMENTO ============ */
+let FOL=null;
+function fFolhas(id){const c=corteDe(id);if(!c)return;FOL={id,cores:JSON.parse(JSON.stringify(c.cores||[]))};open_(htmlFolhas())}
+function stFol(i,campo){const v=FOL.cores[i][campo]||0,r=`FOL.cores[${i}].${campo}`;
+  return`<div class="step"><button onclick="${r}=Math.max(0,(+${r}||0)-1);reopen(htmlFolhas())">−</button><input inputmode="numeric" value="${v}" onchange="${r}=num(this.value);reopen(htmlFolhas())"><button onclick="${r}=(+${r}||0)+1;reopen(htmlFolhas())">+</button></div>`}
+function htmlFolhas(){const c=corteDe(FOL.id),k=calc(Object.assign({},c,{cores:FOL.cores}));
+  return`<h2>Folhas por cor</h2><div class="mut">${esc(c.cod)} · ${esc(c.modelo)} · risco ${k.encT} pç/folha${k.retT?' · retalho '+k.retT+' pç/folha':''}</div>
+  <label>Folhas do risco principal</label>
+  ${FOL.cores.map((x,i)=>`<div class="lin"><span class="nm">${dot(x.cor)}<b>${esc(x.cor)}</b><span class="mut" style="font-size:12px">${x.rolos} rolos</span></span>${stFol(i,'folhas')}</div>`).join('')}
+  ${k.retT?`<label>Folhas do retalho${c.retComp?' ('+n1(c.retComp)+' m)':''}</label>${FOL.cores.map((x,i)=>`<div class="lin"><span class="nm">${dot(x.cor)}<b>${esc(x.cor)}</b></span>${stFol(i,'fret')}</div>`).join('')}`:''}
+  <div class="card" style="margin-top:10px"><div class="row sp"><span class="k">Peças</span><b class="big acc">${n0(k.total)}</b></div>
+  ${k.T.map(t=>`<div class="row sp"><span>${esc(t)}</span><b>${n0(k.porT[t])}</b></div>`).join('')}
+  ${k.retT?`<div class="hint">Principal ${n0(k.folhas)} folhas × ${k.encT} = ${n0(k.folhas*k.encT)} · Retalho ${n0(k.fret)} × ${k.retT} = ${n0(k.retalho)}</div>`:''}</div>
+  <button class="btn" onclick="acao('set',{tab:'cortes',id:FOL.id,campo:'cores',valor:FOL.cores})">Salvar folhas</button>`}
+let OC=null;
+function fOcorr(id){OC={id,desc:'',fotos:[]};open_(htmlOc())}
+function htmlOc(){return`<h2>Ocorrência no tecido</h2><div class="mut">Sujeira, estria, mancha… O corte fica parado até o cliente autorizar.</div>
+  <label>O que foi encontrado</label><input value="${esc(OC.desc)}" oninput="OC.desc=this.value" placeholder="Ex.: estria no rolo marrom 3">
+  <div class="thumbs">${OC.fotos.map(b=>`<img src="${b}">`).join('')}</div>
+  <button class="btn sec" onclick="$('#foc').click()">📷 Foto / vídeo (foto)</button><input id="foc" type="file" accept="image/*" multiple style="display:none" onchange="addOc(this.files)">
+  <button class="btn" onclick="salvaOc()">Registrar</button>`}
+async function addOc(fs){for(const f of[...fs]){try{OC.fotos.push(await reduzir(f,1200,.78))}catch(e){}}reopen(htmlOc())}
+async function salvaOc(){if(!OC.desc&&!OC.fotos.length)return toast('Descreva ou fotografe');const ids=[];
+  if(OC.fotos.length){loading(true,'Enviando fotos…');try{for(const b of OC.fotos)ids.push(await sobeFoto(b))}catch(e){loading(false);return toast('Fotos não subiram: '+e.message)}loading(false)}
+  const id=OC.id;acao('push',{tab:'cortes',id,campo:'ocorr',item:{id:uid(),em:new Date().toISOString(),por:D.user.nome,desc:OC.desc,fotos:ids,aut:''}},false);detCorte(id)}
+function autoriza(id,oid,sim){acao('upd',{tab:'cortes',id,campo:'ocorr',iid:oid,patch:sim?{aut:hoje()}:{neg:hoje()}},false)}
+async function enviaOc(id,oid){const c=corteDe(id),o=(c.ocorr||[]).find(x=>x.id===oid),cl=cliDe(c.cli);
+  const t=`Olá, ${cl.nome}! Na inspeção do tecido do corte ${c.cod} (${c.modelo}) encontramos: ${o.desc||'uma ocorrência'}. Seguem as fotos. Podemos seguir com o corte assim? Só cortamos com a sua autorização.`;
+  const bs=[];for(const f of o.fotos||[]){const b=await getFoto(f);if(b)bs.push(b)}compartilha(t,bs.map((b,i)=>b64File(b,'ocorrencia-'+(i+1)+'.jpg')),cl.tel)}
+let PG=null;
+function fPag(id){const k=calc(corteDe(id));PG={id};open_(`<h2>Pagamento</h2><div class="mut">Saldo ${brl(k.saldo)}</div>
+  <label>Valor</label><input id="pv" inputmode="decimal" value="${String(k.saldo).replace('.',',')}"><label>Data</label><input id="pd" type="date" value="${hoje()}">
+  <label>Forma</label><select id="pf"><option>Pix</option><option>Dinheiro</option><option>Transferência</option><option>Outro</option></select>
+  <button class="btn" onclick="salvaPag()">Registrar</button>`)}
+function salvaPag(){const v=num($('#pv').value);if(!(v>0))return toast('Valor');acao('push',{tab:'cortes',id:PG.id,campo:'pags',item:{id:uid(),valor:v,data:$('#pd').value||hoje(),forma:$('#pf').value}},false);close_();detCorte(PG.id)}
+function rmPag(id,pid){if(confirm('Apagar este pagamento?'))acao('rm',{tab:'cortes',id,campo:'pags',iid:pid},false)}
+function cobrar(id){const c=corteDe(id),k=calc(c),cl=cliDe(c.cli);
+  compartilha(`Olá, ${cl.nome}! Segue o valor do corte ${c.cod} (${c.modelo}, ${n0(k.total)} peças): ${brl(k.saldo)}${k.pago?' (já descontado o que foi pago)':''}. Qualquer dúvida estou à disposição!`,[],cl.tel)}
+function b64File(b,nome){const[h,d]=b.split(',');const bin=atob(d),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new File([u],nome,{type:h.slice(5,h.indexOf(';'))})}
+async function compartilha(t,files,tel){files=files||[];
+  if(files.length&&navigator.canShare&&navigator.canShare({files})){try{await navigator.share({files,text:t});return}catch(e){if(e.name==='AbortError')return}}
+  if(!files.length&&navigator.share&&!tel){try{await navigator.share({text:t});return}catch(e){if(e.name==='AbortError')return}}
+  const n=String(tel||'').replace(/\D/g,'');window.open('https://wa.me/'+(n?(n.length<=11?'55':'')+n:'')+'?text='+encodeURIComponent(t),'_blank')}
+
+/* ============ PDF ============ */
+async function jspdf(){await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');await loadScript('https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js');return window.jspdf.jsPDF}
+function imgDim(b){return new Promise(ok=>{const i=new Image();i.onload=()=>ok([i.width,i.height]);i.onerror=()=>ok([4,3]);i.src=b})}
+async function pdfCliente(id,c){c=c||corteDe(id);loading(true,'Gerando PDF…');try{
+  const J=await jspdf(),doc=new J({unit:'mm',format:'a4'}),k=calc(c),cl=PORTAL?PDATA.cliente:cliDe(c.cli),emp=(PORTAL?PDATA.config.empresa:D.config.empresa)||'Corte';
+  const G=[184,144,79],W=210;let y=16;
+  doc.setFillColor(15,14,13);doc.rect(0,0,W,28,'F');doc.setTextColor(...G);doc.setFont('times','bold');doc.setFontSize(20);doc.text(emp.toUpperCase(),14,17);
+  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(220,210,190);doc.text('Especificação do corte',W-14,12,{align:'right'});doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text(c.cod,W-14,21,{align:'right'});
+  y=38;doc.setTextColor(30,30,30);doc.setFontSize(11);doc.setFont('helvetica','normal');
+  const info=[['Cliente',cl.nome],['Data do corte',dbrY(c.data)],['Modelo',(c.modelo||'')+(c.ref?' · risco '+c.ref:'')],['Status',status(c).t]];
+  info.forEach(([a,b],i)=>{const x=14+(i%2)*92,yy=y+Math.floor(i/2)*7;doc.setTextColor(120);doc.text(a+':',x,yy);doc.setTextColor(20);doc.text(String(b||''),x+28,yy)});y+=18;
+  const T={theme:'grid',styles:{fontSize:9.5,cellPadding:2},headStyles:{fillColor:[34,31,27],textColor:G},margin:{left:14,right:14}};
+  doc.autoTable(Object.assign({},T,{startY:y,head:[['Risco','']],body:[['Aproveitamento',c.aprov?n1(c.aprov)+'%':'—'],['Comprimento × largura',(c.comp?n1(c.comp)+' m':'—')+' × '+(c.larg?n1(c.larg)+' m':'—')],['Encaixes',k.T.filter(t=>+(c.enc||{})[t]).map(t=>c.enc[t]+' '+t).join(' + ')+' = '+k.encT],...(k.retT?[['Risco de retalho',(c.retComp?n1(c.retComp)+' m · ':'')+k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+' '+t).join(' + ')+' = '+k.retT]]:[])],columnStyles:{0:{cellWidth:60}}}));
+  y=doc.lastAutoTable.finalY+5;
+  const ft=c.foto?await getFoto(c.foto):'';
+  if(ft){const[w,h]=await imgDim(ft);let iw=182,ih=iw*h/w;if(ih>80){ih=80;iw=ih*w/h}if(y+ih>280){doc.addPage();y=16}doc.addImage(ft,'JPEG',14,y,iw,ih);y+=ih+5}
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(30);doc.text('Peças por cor e tamanho',14,y+3);y+=6;doc.setFont('helvetica','normal');
+  doc.autoTable(Object.assign({},T,{startY:y,head:[['Cor','Rolos','Folhas',...(k.retT?['Folhas ret.']:[]),...k.T,'Total']],body:k.cores.map(x=>[x.cor,x.rolos,x.folhas,...(k.retT?[x.fret]:[]),...k.T.map(t=>n0(x.p[t])),n0(x.tot)]),
+    foot:[['Total',k.rolos,k.folhas,...(k.retT?[k.fret]:[]),...k.T.map(t=>n0(k.porT[t])),n0(k.total)]],footStyles:{fillColor:[240,234,222],textColor:20,fontStyle:'bold'}}));
+  y=doc.lastAutoTable.finalY+2;if(k.retalho){doc.setFontSize(8.5);doc.setTextColor(110);doc.text('Inclui '+n0(k.retalho)+' peças do risco de retalho ('+k.fret+' folhas × '+k.retT+' encaixes).',14,y+4);y+=6}
+  if(k.sacos.length&&k.folhas){doc.autoTable(Object.assign({},T,{startY:y+4,head:[['Saco','Tamanho','Packs','Peças']],body:k.sacos.map(s=>[s.n+' de '+k.sacos.length,s.tam+(s.ret?' (retalho)':''),s.packs,n0(s.pecas)])}));y=doc.lastAutoTable.finalY}
+  const oa=(c.ocorr||[]).filter(o=>o.aut);
+  if(oa.length){doc.autoTable(Object.assign({},T,{startY:y+5,head:[['Ocorrência no tecido (autorizada pelo cliente)','Autorizado em']],body:oa.map(o=>[o.desc||'—',dbrY(o.aut)])}));y=doc.lastAutoTable.finalY}
+  if(k.valor>0){const pago=k.pago;doc.autoTable(Object.assign({},T,{startY:y+5,head:[['Valor do corte','']],body:[[n0(k.total)+' peças × '+brl(k.preco),brl(k.valor)],...(pago?[['Pago',brl(pago)],['Saldo',brl(k.saldo)]]:[])],columnStyles:{1:{halign:'right',fontStyle:'bold'}}}))}
+  const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(150);doc.text(emp+' · '+c.cod+' · página '+i+'/'+n,W/2,290,{align:'center'})}
+  const blob=doc.output('blob'),file=new File([blob],`Corte ${c.cod} - ${cl.nome}.pdf`,{type:'application/pdf'});loading(false);
+  const tel=PORTAL?'':cliDe(c.cli).tel;
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:`Especificação do corte ${c.cod}`});return}catch(e){if(e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();if(tel&&!PORTAL)toast('PDF baixado — anexe no WhatsApp')
+  }catch(e){loading(false);toast(e.message)}}
+async function etiquetas(id){const c=corteDe(id),k=calc(c),cl=cliDe(c.cli);loading(true,'Gerando etiquetas…');try{
+  const J=await jspdf(),doc=new J({unit:'mm',format:'a4'}),w=95,h=54,mx=10,my=11;
+  k.sacos.forEach((s,i)=>{const p=i%10;if(i&&!p)doc.addPage();const x=mx+(p%2)*w,y=my+Math.floor(p/2)*h;
+    doc.setDrawColor(160);doc.setLineDashPattern([1.5,1.5],0);doc.rect(x,y,w,h);doc.setLineDashPattern([],0);
+    doc.setFont('helvetica','bold');doc.setFontSize(20);doc.setTextColor(20);doc.text(c.cod,x+5,y+11);
+    doc.setFontSize(11);doc.text('Saco '+s.n+'/'+k.sacos.length,x+w-5,y+10,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(cl.nome+' · '+(c.modelo||''),x+5,y+19,{maxWidth:w-10});
+    doc.setFont('helvetica','bold');doc.setFontSize(30);doc.text(s.tam,x+5,y+37);
+    doc.setFontSize(13);doc.text(n0(s.pecas)+' peças',x+w-5,y+31,{align:'right'});doc.setFont('helvetica','normal');doc.setFontSize(10);
+    doc.text(s.packs+' pack'+(s.packs>1?'s':'')+' × '+s.folhas+' folhas',x+w-5,y+38,{align:'right'});if(s.ret){doc.setFontSize(9);doc.text('RETALHO',x+5,y+43)};
+    doc.setFontSize(8.5);doc.setTextColor(90);doc.text(k.cores.filter(x=>s.ret?x.fret:x.folhas).map(x=>x.cor+' '+(s.ret?x.fret:x.folhas)*s.packs).join(' · '),x+5,y+47,{maxWidth:w-10});doc.text(dbrY(c.data),x+w-5,y+h-3,{align:'right'})});
+  const blob=doc.output('blob');loading(false);const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=`Etiquetas ${c.cod}.pdf`;
+  const f=new File([blob],a.download,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]});return}catch(e){if(e.name==='AbortError')return}}a.click()
+  }catch(e){loading(false);toast(e.message)}}
+
+/* ============ CLIENTES ============ */
+function vClientes(){const L=(D.clientes||[]).slice().sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(!L.length)return'<div class="empty">Nenhum cliente ainda</div>';
+  return L.map(c=>{const cs=D.cortes.filter(x=>x.cli===c.id),ks=cs.map(calc),pc=ks.reduce((s,k)=>s+k.total,0),sd=ks.filter(k=>k.valor>0).reduce((s,k)=>s+Math.max(0,k.saldo),0);
+    return`<button class="item" onclick="detCliente('${c.id}')"><div class="row sp"><b>${esc(c.nome)}</b>${ADM()&&sd>0.01?`<span class="pill warn">a receber ${brl(sd)}</span>`:''}</div>
+    <div class="mut">${cs.length} corte${cs.length!==1?'s':''} · ${n0(pc)} peças${ADM()&&c.preco!=null?' · '+brl(c.preco)+'/pç':''}${c.fora?' · tecido de fora':''}</div></button>`}).join('')}
+function linkPortal(c){return location.href.split('?')[0].split('#')[0]+'?c='+c.chave}
+function detCliente(id){const c=cliDe(id),cs=ordena(D.cortes.filter(x=>x.cli===id));
+  open_(`<h2>${esc(c.nome)}</h2><div class="mut">${c.tel?esc(c.tel):'sem telefone'}${c.fora?' · traz tecido de fora':''}</div>
+  ${ADM()?`<button class="btn wa" onclick="enviaLink('${id}')">Enviar link de acompanhamento</button><button class="btn sec" onclick="fCliente('${id}')">Editar cliente</button>`:''}
+  <h3>Cortes</h3>${cs.length?cs.map(x=>cardCorte(x,false)).join(''):'<div class="mut">Nenhum corte</div>'}`)}
+function enviaLink(id){const c=cliDe(id);compartilha(`Olá, ${c.nome}! Por este link você acompanha seus cortes e baixa o PDF de cada um: ${linkPortal(c)}`,[],c.tel)}
+function fCliente(id){const c=id?cliDe(id):{nome:'',tel:'',preco:D.config.preco||0.4,fora:false};
+  open_(`<h2>${id?'Editar cliente':'Novo cliente'}</h2><label>Nome</label><input id="cn" value="${esc(c.nome)}"><label>WhatsApp</label><input id="ct" inputmode="tel" value="${esc(c.tel||'')}">
+  <label>Preço do corte por peça (R$)</label><input id="cp" inputmode="decimal" value="${m2(c.preco)}" onblur="this.value=m2(num(this.value))"><div class="hint">Padrão R$ 0,40 para quem compra o tecido com vocês. Peças maiores podem ter preço próprio no corte.</div>
+  <label class="row" style="margin-top:14px;gap:10px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink)"><input id="cf" type="checkbox" style="width:22px;height:22px;accent-color:var(--acc)" ${c.fora?'checked':''}> Traz tecido de fora</label>
+  <button class="btn" onclick="salvaCli('${id||''}')">Salvar</button>${id&&!D.cortes.some(x=>x.cli===id)?`<button class="btn bad" onclick="if(confirm('Excluir cliente?'))acao('del',{tab:'clientes',id:'${id}'})">Excluir</button>`:''}`)}
+function salvaCli(id){const nm=$('#cn').value.trim();if(!nm)return toast('Nome');const old=id?cliDe(id):{};
+  const rec=Object.assign({},old,{id:id||uid(),nome:nm,tel:$('#ct').value.replace(/\D/g,''),preco:num($('#cp').value)||0,fora:$('#cf').checked,chave:old.chave||chave()});
+  acao('put',{tab:'clientes',rec})}
+
+/* ============ CAIXA (só sócios) ============ */
+let CX={m:'semana',ref:hoje()};
+function faixa(){const d=new Date(CX.ref+'T12:00');if(CX.m==='dia')return[CX.ref,CX.ref];
+  if(CX.m==='semana'){const w=(d.getDay()+6)%7,a=new Date(d);a.setDate(d.getDate()-w);const b=new Date(a);b.setDate(a.getDate()+6);return[dstr(a),dstr(b)]}
+  return[dstr(new Date(d.getFullYear(),d.getMonth(),1)),dstr(new Date(d.getFullYear(),d.getMonth()+1,0))]}
+function anda(n){const d=new Date(CX.ref+'T12:00');if(CX.m==='dia')d.setDate(d.getDate()+n);else if(CX.m==='semana')d.setDate(d.getDate()+7*n);else d.setMonth(d.getMonth()+n,1);CX.ref=dstr(d);render()}
+function vCaixa(){const[a,b]=faixa(),inR=d=>d&&d>=a&&d<=b,cfg=D.config;
+  const pags=[];D.cortes.forEach(c=>(c.pags||[]).forEach(p=>{if(inR(p.data))pags.push(Object.assign({cod:c.cod,cli:cliDe(c.cli).nome,cid:c.id},p))}));
+  const des=(D.despesas||[]).filter(x=>inR(x.data)),fat=D.cortes.filter(c=>inR(c.data)),kf=fat.map(calc);
+  const rec=pags.reduce((s,p)=>s+(+p.valor||0),0),dsp=des.reduce((s,x)=>s+(+x.valor||0),0),res=rec-dsp;
+  const titulo=CX.m==='dia'?dbrY(a):CX.m==='semana'?dbr(a)+' a '+dbr(b):['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][+a.slice(5,7)-1]+' '+a.slice(0,4);
+  const dias={};pags.forEach(p=>{(dias[p.data]=dias[p.data]||{r:0,d:0}).r+=+p.valor||0});des.forEach(x=>{(dias[x.data]=dias[x.data]||{r:0,d:0}).d+=+x.valor||0});
+  const ar=D.cortes.map(c=>({c,k:calc(c)})).filter(x=>x.k.saldo>0.01&&x.k.valor>0).sort((p,q)=>(p.c.data||'').localeCompare(q.c.data||''));
+  return`<div class="chips">${[['dia','Dia'],['semana','Semana'],['mes','Mês']].map(([k,n])=>`<button class="${CX.m===k?'on':''}" onclick="CX.m='${k}';render()">${n}</button>`).join('')}</div>
+  <div class="row sp" style="margin-bottom:10px"><button class="btn sm sec" onclick="anda(-1)">‹</button><b class="mid">${titulo}</b><button class="btn sm sec" onclick="anda(1)">›</button></div>
+  <div class="card"><div class="k">Resultado (recebido − despesas)</div><div class="big" style="color:${res<0?'var(--bad)':'var(--acc)'}">${brl(res)}</div>
+   <div class="grid2" style="margin-top:10px"><div><div class="k">Manuel</div><b class="mid">${brl(res/2)}</b></div><div><div class="k">${esc(cfg.socio||'Sócio')}</div><b class="mid">${brl(res/2)}</b></div></div></div>
+  <div class="grid3"><div class="st"><span class="k">Recebido</span><b style="font-size:16px">${brl(rec)}</b></div><div class="st"><span class="k">Despesas</span><b style="font-size:16px">${brl(dsp)}</b></div><div class="st"><span class="k">Cortado</span><b style="font-size:16px">${n0(kf.reduce((s,k)=>s+k.total,0))} pç</b></div></div>
+  <div class="hint" style="margin:6px 0 10px">Faturado no período (cortes feitos): ${brl(kf.reduce((s,k)=>s+k.valor,0))}</div>
+  ${CX.m!=='dia'&&Object.keys(dias).length?`<div class="card"><div class="k" style="margin-bottom:4px">Dia a dia</div><table><tr><th>Dia</th><th>Recebido</th><th>Despesas</th><th>Resultado</th></tr>${Object.keys(dias).sort().map(d=>`<tr onclick="CX.m='dia';CX.ref='${d}';render()"><td>${dbr(d)}</td><td>${brl(dias[d].r)}</td><td>${brl(dias[d].d)}</td><td><b>${brl(dias[d].r-dias[d].d)}</b></td></tr>`).join('')}</table></div>`:''}
+  <button class="btn sec" onclick="diaria()">Lançar diária da equipe de hoje (${brl(cfg.diaria||400)})</button>
+  <div class="k" style="margin:16px 0 6px">Recebimentos</div>${pags.length?pags.sort((p,q)=>q.data.localeCompare(p.data)).map(p=>`<div class="lin" onclick="detCorte('${p.cid}')"><span>${dbr(p.data)} · ${esc(p.cod)} · ${esc(p.cli)} <span class="mut">${esc(p.forma||'')}</span></span><b>${brl(p.valor)}</b></div>`).join(''):'<div class="mut">Nenhum</div>'}
+  <div class="k" style="margin:16px 0 6px">Despesas</div>${des.length?des.sort((p,q)=>q.data.localeCompare(p.data)).map(x=>`<div class="lin"><span>${dbr(x.data)} · ${esc(x.tipo)}${x.desc?' · '+esc(x.desc):''}</span><span class="row"><b>${brl(x.valor)}</b><button class="x" onclick="if(confirm('Apagar despesa?'))acao('del',{tab:'despesas',id:'${x.id}'},false)">×</button></span></div>`).join(''):'<div class="mut">Nenhuma</div>'}
+  <div class="k" style="margin:16px 0 6px">A receber (todos os cortes)</div>${ar.length?ar.map(x=>`<div class="lin" onclick="detCorte('${x.c.id}')"><span>${esc(x.c.cod)} · ${esc(cliDe(x.c.cli).nome)} <span class="pill ${x.c.retirado?'bad':'pe'}">${x.c.retirado?'retirado':status(x.c).t}</span></span><b>${brl(x.k.saldo)}</b></div>`).join(''):'<div class="mut">Tudo recebido</div>'}
+  <h3 style="margin:22px 0 6px;font:700 13px var(--serif);color:var(--acc);letter-spacing:1px">AJUSTES</h3>
+  <div class="card"><div class="grid2"><div><label style="margin-top:0">Diária equipe</label><input inputmode="decimal" value="${m2(cfg.diaria??400)}" onchange="acao('cfg',{k:'diaria',v:num(this.value)},false)"></div>
+  <div><label style="margin-top:0">Preço padrão/pç</label><input inputmode="decimal" value="${m2(cfg.preco??0.4)}" onchange="acao('cfg',{k:'preco',v:num(this.value)},false)"></div>
+  <div><label>Nome do sócio</label><input value="${esc(cfg.socio||'')}" onchange="acao('cfg',{k:'socio',v:this.value},false)"></div>
+  <div><label>Nome no PDF</label><input value="${esc(cfg.empresa||'')}" onchange="acao('cfg',{k:'empresa',v:this.value},false)"></div>
+</div>
+  <button class="btn sec" onclick="sair()">Sair deste aparelho</button></div>`}
+function diaria(){const v=+D.config.diaria||400;if((D.despesas||[]).some(x=>x.data===hoje()&&x.tipo==='Diária equipe')&&!confirm('Já tem diária lançada hoje. Lançar outra?'))return;
+  acao('put',{tab:'despesas',rec:{id:uid(),data:hoje(),tipo:'Diária equipe',desc:'',valor:v}},false)}
+function fDespesa(){open_(`<h2>Despesa</h2><label>Tipo</label><select id="dt"><option>Diária equipe</option><option>Custo fixo</option><option>Material</option><option>Frete</option><option>Outra</option></select>
+  <label>Descrição</label><input id="dd" placeholder="Ex.: aluguel, papel do risco…"><label>Valor</label><input id="dv" inputmode="decimal"><label>Data</label><input id="dda" type="date" value="${hoje()}">
+  <button class="btn" onclick="salvaDesp()">Salvar</button>`)}
+function salvaDesp(){const v=num($('#dv').value);if(!(v>0))return toast('Valor');acao('put',{tab:'despesas',rec:{id:uid(),data:$('#dda').value||hoje(),tipo:$('#dt').value,desc:$('#dd').value.trim(),valor:v}})}
+
+/* ============ PORTAL DO CLIENTE (?c=chave) ============ */
+let PORTAL='',PDATA=null;
+async function portal(chave){PORTAL=chave;$('#login').style.display='none';$('#app').style.display='block';$('#nav').style.display='none';$('.fab')&&$('.fab').remove();
+  $('header button').onclick=()=>portal(chave);
+  try{loading(true);const r=await post('portal',{chave});PDATA=r.data;store('cor_p_'+chave,JSON.stringify(PDATA))}catch(e){try{PDATA=JSON.parse(getStore('cor_p_'+chave))}catch(_){}if(!PDATA){loading(false);$('#main').innerHTML='<div class="empty">'+esc(e.message)+'</div>';return}}finally{loading(false)}
+  $('#htit').textContent=PDATA.config.empresa||'Corte';$('#sub').textContent=PDATA.cliente.nome;
+  const L=ordena(PDATA.cortes);
+  $('#main').innerHTML=`<div class="mid" style="margin:4px 0 12px">Olá, ${esc(PDATA.cliente.nome)}</div>`+(L.length?L.map(c=>{const k=calc(c),s=status(c);
+    return`<div class="card"><div class="row sp"><b class="mid">${esc(c.cod)}</b><span class="pill ${s.k}">${esc(s.t)}</span></div>
+    <div class="mut">${esc(c.modelo||'')} · ${dbrY(c.data)}</div>
+    <div class="grid3" style="margin-top:8px"><div class="st"><span class="k">Peças</span><b>${n0(k.total)}</b></div><div class="st"><span class="k">Valor</span><b style="font-size:15px">${brl(k.valor)}</b></div><div class="st"><span class="k">A pagar</span><b style="font-size:15px">${brl(Math.max(0,k.saldo))}</b></div></div>
+    ${k.total?`<table style="margin-top:10px"><tr><th>Cor</th>${k.T.map(t=>`<th>${esc(t)}</th>`).join('')}<th>Total</th></tr>${k.cores.map(x=>`<tr><td>${dot(x.cor)} ${esc(x.cor)}</td>${k.T.map(t=>`<td>${n0(x.p[t])}</td>`).join('')}<td><b>${n0(x.tot)}</b></td></tr>`).join('')}<tr class="tot"><td>Total</td>${k.T.map(t=>`<td>${n0(k.porT[t])}</td>`).join('')}<td>${n0(k.total)}</td></tr></table>`:''}
+    <button class="btn sec" onclick="pdfCliente('',PDATA.cortes.find(x=>x.id==='${c.id}'))">Baixar PDF</button></div>`}).join(''):'<div class="empty">Nenhum corte ainda</div>')}
+
+/* ============ CAMPOS NUMÉRICOS ============ */
+document.addEventListener('focusin',e=>{const t=e.target;if(t.tagName!=='INPUT'||!/numeric|decimal/.test(t.inputMode||'')||t.type==='password')return;
+  if(num(t.value)===0)t.value='';else setTimeout(()=>{try{t.select();t.setSelectionRange(0,t.value.length)}catch(_){}},0)});
+document.addEventListener('focusout',e=>{const t=e.target;if(t.tagName==='INPUT'&&t.closest('.step')&&t.value==='')t.value='0'});
+/* ============ INÍCIO ============ */
+(function(){const q=new URLSearchParams(location.search),c=q.get('c');
+  if(c){portal(c);return}
+  if(DEMO)$('#ldemo').textContent='Demonstração: PIN 1234 (Manuel), 5678 (sócio) ou 1111 (equipe)';
+  const p=getStore('cor_pin');if(p){$('#pin').value=p;entrar()}})();
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+setInterval(()=>{if(D&&!$('.sheet')&&TAB==='hoje'&&document.visibilityState==='visible')render()},60000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&D&&!PORTAL)carregar()});
+</script>
+</body>
+</html>
