@@ -12,13 +12,13 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{--bg:#0f0e0d;--card:#1a1815;--card2:#221f1b;--ink:#ece4d4;--mut:#9a907c;--line:#2e2a24;--acc:#b8904f;--acc-ink:#15120e;--ok:#8fae6b;--warn:#d6a74a;--bad:#c4553b;--r:12px;--serif:"Playfair Display",Georgia,serif}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;color:var(--ink);font:15px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg)}
-body{background:repeating-linear-gradient(45deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px),repeating-linear-gradient(-45deg,rgba(0,0,0,.25) 0 2px,transparent 2px 6px),radial-gradient(ellipse at top,#1d1a16 0%,#0f0e0d 60%);background-attachment:fixed;min-height:100vh}
-header{position:sticky;top:0;z-index:5;background:rgba(12,11,10,.96);backdrop-filter:blur(6px);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--acc)}
+body{background:repeating-linear-gradient(45deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px),repeating-linear-gradient(-45deg,rgba(0,0,0,.25) 0 2px,transparent 2px 6px),radial-gradient(ellipse at top,#1d1a16 0%,#0f0e0d 60%);background-repeat:no-repeat;background-color:var(--bg);min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(12,11,10,.96);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--acc)}
 header h1{margin:0;font:800 20px/1 var(--serif);letter-spacing:4px;text-transform:uppercase;color:var(--acc)}
 header small{color:var(--mut);font-size:11px;letter-spacing:.5px}
 header button{background:none;border:1px solid var(--line);color:var(--mut);border-radius:6px;padding:6px 9px;font:inherit;font-size:12px}
@@ -229,7 +229,7 @@ async function entrar(){PIN=$('#pin').value.trim();if(!PIN)return;
   const cache=getStore(CK());
   if(cache){try{store('cor_pin',PIN);abrir();setD(JSON.parse(cache),true);carregar();return}catch(e){}}
   try{await call('login');store('cor_pin',PIN);abrir();carregar()}catch(e){$('#lerr').textContent=e.message;if(/PIN/.test(e.message))store('cor_pin')}}
-function sair(){if(!confirm('Sair deste aparelho?'))return;store('cor_pin');store(CK());location.reload()}
+async function sair(){if(!await pergunta('Sair deste aparelho?'))return;store('cor_pin');store(CK());location.reload()}
 function abrir(){$('#login').style.display='none';$('#app').style.display='block';history.replaceState({t:TAB},'')}
 let RAW=null;
 async function carregar(force){if(CARR)return;CARR=true;sync(true);if(!D)loading(true);
@@ -303,11 +303,11 @@ function vCortes(){const f=FC.f,q=FC.q.toLowerCase();
   ${L.length?ordena(L).map(c=>cardCorte(c)).join(''):'<div class="empty">Nada por aqui</div>'}`}
 
 /* ============ DETALHE DO CORTE ============ */
-function marca(id,e,t){const c=corteDe(id);if(!c)return;
-  if(e==='corte'&&t==='i'&&!calc(c).folhas&&!confirm('As folhas ainda não foram lançadas. Iniciar o corte mesmo assim?'))return;
+async function marca(id,e,t){const c=corteDe(id);if(!c)return;
+  if(e==='corte'&&t==='i'&&!calc(c).folhas&&!await pergunta('As folhas ainda não foram lançadas. Iniciar o corte mesmo assim?'))return;
   acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t,em:new Date().toISOString(),por:D.user.nome}},false);
   if(e==='infesto'&&t==='f')setTimeout(()=>fFolhas(id),300)}
-function pular(id,e){if(!confirm(`Marcar "${ETN[e]}" como feito (sem horário)?`))return;const em=new Date().toISOString();
+async function pular(id,e){if(!await pergunta(`Marcar "${ETN[e]}" como feito (sem horário)?`))return;const em=new Date().toISOString();
   acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t:'f',em,por:D.user.nome,pulo:1}},false)}
 function retirar(id){const c=corteDe(id);acao('set',{tab:'cortes',id,campo:'retirado',valor:c.retirado?'':hoje()},false)}
 function detCorte(id){open_(htmlCorte(id),()=>{if(corteDe(id))reopen(htmlCorte(id));else close_()});carregaFotos(id)}
@@ -362,7 +362,7 @@ function htmlCorte(id){const c=corteDe(id);if(!c)return'';const k=calc(c),cl=cli
     <button class="btn sec" onclick="fCorte('${id}')">Editar corte</button><button class="btn bad" onclick="excluiCorte('${id}')">Excluir corte</button>`;
   return h}
 function setPacks(id,v){v=Math.max(0,Math.round(+v||0));acao('set',{tab:'cortes',id,campo:'packs',valor:v},false)}
-function excluiCorte(id){const c=corteDe(id);if(!confirm(`Excluir o corte ${c.cod}? Isso não tem volta.`))return;acao('del',{tab:'cortes',id})}
+async function excluiCorte(id){const c=corteDe(id);if(!await pergunta(`Excluir o corte ${c.cod}? Isso não tem volta.`))return;acao('del',{tab:'cortes',id})}
 
 /* ============ FOTOS ============ */
 const FOTOS={};
@@ -393,7 +393,7 @@ function htmlForm(){const F=FORM,adm=ADM(),k=calc(Object.assign({},F,{enc:pick(F
   <div class="grid3"><div><label>Aprov. %</label><input inputmode="decimal" value="${F.aprov}" oninput="FORM.aprov=num(this.value)"></div><div><label>Compr. m</label><input inputmode="decimal" value="${F.comp}" oninput="FORM.comp=num(this.value)"></div><div><label>Largura m</label><input inputmode="decimal" value="${F.larg}" oninput="FORM.larg=num(this.value)"></div></div>
   <label>Encaixes por tamanho</label>
   ${F._tams.map((t,i)=>`<div class="lin"><span class="nm"><b>${esc(t)}</b></span><div class="row">${stepper('enc',t)}<button class="x" onclick="FORM._tams.splice(${i},1);delete FORM.enc['${esc(t)}'];delete FORM.ret['${esc(t)}'];reopen(htmlForm())">×</button></div></div>`).join('')}
-  ${F._addT?`<div class="card" style="padding:10px"><div class="row wrap" style="gap:6px">${['R1','R2','R3','R4','P','M','G','GG','U'].filter(t=>!F._tams.includes(t)).map(t=>`<button class="btn sm sec" onclick="addTam('${t}')">${t}</button>`).join('')}<button class="btn sm sec" onclick="addTam(prompt('Nome do tamanho'))">Outro…</button></div></div>`
+  ${F._addT?`<div class="card" style="padding:10px"><div class="row wrap" style="gap:6px">${['R1','R2','R3','R4','P','M','G','GG','U'].filter(t=>!F._tams.includes(t)).map(t=>`<button class="btn sm sec" onclick="addTam('${t}')">${t}</button>`).join('')}<button class="btn sm sec" onclick="(async()=>{addTam(await pedeValor('Nome do tamanho'))})()">Outro…</button></div></div>`
    :`<button id="addT" class="btn sm sec" style="font-size:22px;padding:4px 18px" onclick="FORM._addT=1;reopen(htmlForm())">+</button>`}
   <label class="row" style="margin-top:14px;gap:10px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink)"><input type="checkbox" style="width:22px;height:22px;accent-color:var(--acc)" ${F._ret?'checked':''} onchange="FORM._ret=this.checked;reopen(htmlForm())"> Tem risco de retalho</label>
   <div class="hint">Risco principal: ${k.encT} peças por folha.</div>
@@ -419,7 +419,7 @@ function htmlPick(){const P=FORM._pick,hab=coresDoCli(FORM.cli),usadas=FORM.core
   let L=P.todas?Object.keys(CORES).concat(hab.filter(c=>!CORES[c])):hab;L=L.filter(c=>!usadas.includes(c));P.sel.forEach(c=>{if(!L.includes(c))L.push(c)});
   return`<div class="card" style="padding:10px"><div class="k" style="margin-bottom:8px">Toque nas cores do corte</div><div class="row wrap" style="gap:6px">
    ${L.map(c=>`<button class="btn sm ${P.sel.includes(c)?'':'sec'}" onclick="togCor('${esc(c)}')">${dot(c)} ${esc(c)}</button>`).join('')}
-   ${P.todas?`<button class="btn sm sec" onclick="togCor(prompt('Nome da cor'))">Outra…</button>`:`<button class="btn sm sec" onclick="FORM._pick.todas=1;reopen(htmlForm())">+ Outra cor</button>`}</div>
+   ${P.todas?`<button class="btn sm sec" onclick="(async()=>{togCor(await pedeValor('Nome da cor'))})()">Outra…</button>`:`<button class="btn sm sec" onclick="FORM._pick.todas=1;reopen(htmlForm())">+ Outra cor</button>`}</div>
    <div class="grid2"><button class="btn sec" onclick="FORM._pick=null;reopen(htmlForm())">Cancelar</button><button class="btn" onclick="okCores()">OK${P.sel.length?' ('+P.sel.length+')':''}</button></div></div>`}
 function togCor(c){c=String(c||'').trim();if(!c)return;c=c[0].toUpperCase()+c.slice(1);const S=FORM._pick.sel,i=S.indexOf(c);i>=0?S.splice(i,1):S.push(c);reopen(htmlForm())}
 function okCores(){FORM._pick.sel.forEach(c=>{if(!FORM.cores.some(x=>x.cor===c))FORM.cores.push({cor:c,rolos:1,folhas:0})});FORM._pick=null;reopen(htmlForm())}
@@ -490,7 +490,7 @@ function fPag(id){const k=calc(corteDe(id));PG={id};open_(`<h2>Pagamento</h2><di
   <label>Forma</label><select id="pf"><option>Pix</option><option>Dinheiro</option><option>Transferência</option><option>Outro</option></select>
   <button class="btn" onclick="salvaPag()">Registrar</button>`)}
 function salvaPag(){const v=num($('#pv').value);if(!(v>0))return toast('Valor');acao('push',{tab:'cortes',id:PG.id,campo:'pags',item:{id:uid(),valor:v,data:$('#pd').value||hoje(),forma:$('#pf').value}},false);close_();detCorte(PG.id)}
-function rmPag(id,pid){if(confirm('Apagar este pagamento?'))acao('rm',{tab:'cortes',id,campo:'pags',iid:pid},false)}
+async function rmPag(id,pid){if(await pergunta('Apagar este pagamento?'))acao('rm',{tab:'cortes',id,campo:'pags',iid:pid},false)}
 function cobrar(id){const c=corteDe(id),k=calc(c),cl=cliDe(c.cli);
   compartilha(`Olá, ${cl.nome}! Segue o valor do corte ${c.cod} (${c.modelo}, ${n0(k.total)} peças): ${brl(k.saldo)}${k.pago?' (já descontado o que foi pago)':''}. Qualquer dúvida estou à disposição!`,[],cl.tel)}
 function b64File(b,nome){const[h,d]=b.split(',');const bin=atob(d),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new File([u],nome,{type:h.slice(5,h.indexOf(';'))})}
@@ -560,7 +560,7 @@ function fCliente(id){const c=id?cliDe(id):{nome:'',tel:'',preco:D.config.preco|
   open_(`<h2>${id?'Editar cliente':'Novo cliente'}</h2><label>Nome</label><input id="cn" value="${esc(c.nome)}"><label>WhatsApp</label><input id="ct" inputmode="tel" value="${esc(c.tel||'')}">
   <label>Preço do corte por peça (R$)</label><input id="cp" inputmode="decimal" value="${m2(c.preco)}" onblur="this.value=m2(num(this.value))"><div class="hint">Padrão R$ 0,40 para quem compra o tecido com vocês. Peças maiores podem ter preço próprio no corte.</div>
   <label class="row" style="margin-top:14px;gap:10px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink)"><input id="cf" type="checkbox" style="width:22px;height:22px;accent-color:var(--acc)" ${c.fora?'checked':''}> Traz tecido de fora</label>
-  <button class="btn" onclick="salvaCli('${id||''}')">Salvar</button>${id&&!D.cortes.some(x=>x.cli===id)?`<button class="btn bad" onclick="if(confirm('Excluir cliente?'))acao('del',{tab:'clientes',id:'${id}'})">Excluir</button>`:''}`)}
+  <button class="btn" onclick="salvaCli('${id||''}')">Salvar</button>${id&&!D.cortes.some(x=>x.cli===id)?`<button class="btn bad" onclick="(async()=>{if(await pergunta('Excluir cliente?'))acao('del',{tab:'clientes',id:'${id}'})})()">Excluir</button>`:''}`)}
 function salvaCli(id){const nm=$('#cn').value.trim();if(!nm)return toast('Nome');const old=id?cliDe(id):{};
   const rec=Object.assign({},old,{id:id||uid(),nome:nm,tel:$('#ct').value.replace(/\D/g,''),preco:num($('#cp').value)||0,fora:$('#cf').checked,chave:old.chave||chave()});
   acao('put',{tab:'clientes',rec})}
@@ -587,7 +587,7 @@ function vCaixa(){const[a,b]=faixa(),inR=d=>d&&d>=a&&d<=b,cfg=D.config;
   ${CX.m!=='dia'&&Object.keys(dias).length?`<div class="card"><div class="k" style="margin-bottom:4px">Dia a dia</div><table><tr><th>Dia</th><th>Recebido</th><th>Despesas</th><th>Resultado</th></tr>${Object.keys(dias).sort().map(d=>`<tr onclick="CX.m='dia';CX.ref='${d}';render()"><td>${dbr(d)}</td><td>${brl(dias[d].r)}</td><td>${brl(dias[d].d)}</td><td><b>${brl(dias[d].r-dias[d].d)}</b></td></tr>`).join('')}</table></div>`:''}
   <button class="btn sec" onclick="diaria()">Lançar diária da equipe de hoje (${brl(cfg.diaria||400)})</button>
   <div class="k" style="margin:16px 0 6px">Recebimentos</div>${pags.length?pags.sort((p,q)=>q.data.localeCompare(p.data)).map(p=>`<div class="lin" onclick="detCorte('${p.cid}')"><span>${dbr(p.data)} · ${esc(p.cod)} · ${esc(p.cli)} <span class="mut">${esc(p.forma||'')}</span></span><b>${brl(p.valor)}</b></div>`).join(''):'<div class="mut">Nenhum</div>'}
-  <div class="k" style="margin:16px 0 6px">Despesas</div>${des.length?des.sort((p,q)=>q.data.localeCompare(p.data)).map(x=>`<div class="lin"><span>${dbr(x.data)} · ${esc(x.tipo)}${x.desc?' · '+esc(x.desc):''}</span><span class="row"><b>${brl(x.valor)}</b><button class="x" onclick="if(confirm('Apagar despesa?'))acao('del',{tab:'despesas',id:'${x.id}'},false)">×</button></span></div>`).join(''):'<div class="mut">Nenhuma</div>'}
+  <div class="k" style="margin:16px 0 6px">Despesas</div>${des.length?des.sort((p,q)=>q.data.localeCompare(p.data)).map(x=>`<div class="lin"><span>${dbr(x.data)} · ${esc(x.tipo)}${x.desc?' · '+esc(x.desc):''}</span><span class="row"><b>${brl(x.valor)}</b><button class="x" onclick="(async()=>{if(await pergunta('Apagar despesa?'))acao('del',{tab:'despesas',id:'${x.id}'},false)})()">×</button></span></div>`).join(''):'<div class="mut">Nenhuma</div>'}
   <div class="k" style="margin:16px 0 6px">A receber (todos os cortes)</div>${ar.length?ar.map(x=>`<div class="lin" onclick="detCorte('${x.c.id}')"><span>${esc(x.c.cod)} · ${esc(cliDe(x.c.cli).nome)} <span class="pill ${x.c.retirado?'bad':'pe'}">${x.c.retirado?'retirado':status(x.c).t}</span></span><b>${brl(x.k.saldo)}</b></div>`).join(''):'<div class="mut">Tudo recebido</div>'}
   <h3 style="margin:22px 0 6px;font:700 13px var(--serif);color:var(--acc);letter-spacing:1px">AJUSTES</h3>
   <div class="card"><div class="grid2"><div><label style="margin-top:0">Diária equipe</label><input inputmode="decimal" value="${m2(cfg.diaria??400)}" onchange="acao('cfg',{k:'diaria',v:num(this.value)},false)"></div>
@@ -596,7 +596,7 @@ function vCaixa(){const[a,b]=faixa(),inR=d=>d&&d>=a&&d<=b,cfg=D.config;
   <div><label>Nome no PDF</label><input value="${esc(cfg.empresa||'')}" onchange="acao('cfg',{k:'empresa',v:this.value},false)"></div>
 </div>
   <button class="btn sec" onclick="sair()">Sair deste aparelho</button></div>`}
-function diaria(){const v=+D.config.diaria||400;if((D.despesas||[]).some(x=>x.data===hoje()&&x.tipo==='Diária equipe')&&!confirm('Já tem diária lançada hoje. Lançar outra?'))return;
+async function diaria(){const v=+D.config.diaria||400;if((D.despesas||[]).some(x=>x.data===hoje()&&x.tipo==='Diária equipe')&&!await pergunta('Já tem diária lançada hoje. Lançar outra?'))return;
   acao('put',{tab:'despesas',rec:{id:uid(),data:hoje(),tipo:'Diária equipe',desc:'',valor:v}},false)}
 function fDespesa(){open_(`<h2>Despesa</h2><label>Tipo</label><select id="dt"><option>Diária equipe</option><option>Custo fixo</option><option>Material</option><option>Frete</option><option>Outra</option></select>
   <label>Descrição</label><input id="dd" placeholder="Ex.: aluguel, papel do risco…"><label>Valor</label><input id="dv" inputmode="decimal"><label>Data</label><input id="dda" type="date" value="${hoje()}">
@@ -629,6 +629,18 @@ document.addEventListener('focusout',e=>{const t=e.target;if(t.tagName==='INPUT'
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 setInterval(()=>{if(D&&!$('.sheet')&&TAB==='hoje'&&document.visibilityState==='visible')render()},60000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&D&&!PORTAL)carregar()});
+</script>
+<div id="cfm"></div>
+<style>#cfm .sheet{z-index:45}.btn.bad{background:#7a2a1c;border-color:#9a3a26;color:#fbe4da}</style>
+<script>
+// diálogos próprios (o confirm/prompt do celular pode ser bloqueado no app instalado)
+function pergunta(msg,sim,perigo){return new Promise(res=>{const el=document.getElementById('cfm'),e=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  el.innerHTML=`<div class="sheet" id="cfmb"><div><h2>Confirmar</h2><p style="font-size:15px;margin:4px 0 0">${e(msg)}</p><button class="btn${perigo?' bad':''}" id="cfok">${e(sim||'Confirmar')}</button><button class="btn sec" id="cfno">Cancelar</button></div></div>`;
+  const fim=v=>{el.innerHTML='';res(v)};document.getElementById('cfok').onclick=()=>fim(true);document.getElementById('cfno').onclick=()=>fim(false);document.getElementById('cfmb').onclick=ev=>{if(ev.target.id==='cfmb')fim(false)}})}
+function pedeValor(msg,ini){return new Promise(res=>{const el=document.getElementById('cfm'),e=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  el.innerHTML=`<div class="sheet" id="cfmb"><div><h2>Informe</h2><p style="font-size:14px;margin:4px 0 10px">${e(msg)}</p><input id="cfv" value="${e(ini)}"><button class="btn" id="cfok">OK</button><button class="btn sec" id="cfno">Cancelar</button></div></div>`;
+  const v=()=>document.getElementById('cfv').value,fim=x=>{el.innerHTML='';res(x)};document.getElementById('cfok').onclick=()=>fim(v());document.getElementById('cfno').onclick=()=>fim(null);document.getElementById('cfv').onkeydown=ev=>{if(ev.key==='Enter')fim(v())};setTimeout(()=>{const i=document.getElementById('cfv');if(i){i.focus();i.select()}},60)})}
+if('serviceWorker' in navigator){const tinha=!!navigator.serviceWorker.controller;let rec=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!tinha||rec)return;rec=true;const m=document.getElementById('modal');if(!(m&&m.innerHTML)&&!document.getElementById('cfm').innerHTML)location.reload()})}
 </script>
 </body>
 </html>
