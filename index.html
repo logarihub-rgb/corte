@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#0f0e0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Corte">
-<title>Corte</title>
+<meta name="apple-mobile-web-app-title" content="Sandel">
+<title>Sandel</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -93,6 +93,10 @@ tr.tot td{font-weight:700;color:var(--acc);border-bottom:0}
 .msg.bot{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
 .msg.bot .ln{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid var(--line);font-size:13.5px}.msg.bot .ln:last-child{border:0}
 .msg.bot h4{margin:0 0 6px;font:800 15px var(--serif);color:var(--acc)}
+.hb.mas{padding:1px 4px;vertical-align:middle}.hb.mas svg{width:30px;height:30px;display:block}
+.mic{border:0;border-radius:22px;background:#221f1b;border:1px solid var(--line);color:var(--acc);width:46px;flex:none;display:flex;align-items:center;justify-content:center}.mic svg{width:20px;height:20px}.mic.on{background:var(--bad);color:#fff;border-color:var(--bad);animation:pul 1s infinite}
+@keyframes pul{50%{opacity:.6}}.bav{display:flex;gap:8px;align-items:flex-end}.bav svg{width:30px;height:30px;flex:none}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}.duo .btn{margin-top:8px}
 .cbar{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:6;background:#0c0b0a;border-top:1px solid var(--line);padding:8px 10px}
 .cbar .sg{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px}.cbar .sg button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:6px 11px;font:inherit;font-size:12.5px}
 .cbar form{display:flex;gap:8px;max-width:640px;margin:0 auto}.cbar input{flex:1;border-radius:22px;padding:11px 16px}.cbar form button{border:0;border-radius:22px;background:var(--acc);color:var(--acc-ink);font:inherit;font-weight:700;padding:0 16px}
@@ -100,8 +104,8 @@ tr.tot td{font-weight:700;color:var(--acc);border-bottom:0}
 </head>
 <body>
 <div id="login">
-  <h1>CORTE</h1>
-  <p class="mut" style="margin:0;letter-spacing:3px;text-transform:uppercase;font-size:11px">Logari · Mooca</p><div class="rule"></div>
+  <h1>SANDEL</h1>
+  <p class="mut" style="margin:0;letter-spacing:3px;text-transform:uppercase;font-size:11px">Corte · Mooca</p><div class="rule"></div>
   <p class="mut" style="margin:0 0 10px">Digite seu PIN</p>
   <input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" onkeydown="if(event.key==='Enter')entrar()">
   <button class="btn" onclick="entrar()">Entrar</button>
@@ -109,7 +113,7 @@ tr.tot td{font-weight:700;color:var(--acc);border-bottom:0}
   <p id="ldemo" class="hint"></p>
 </div>
 <div id="app" style="display:none">
-  <header><div><h1 id="htit">Corte</h1><small id="sub"></small><span id="sync" class="sync"></span></div><div><button class="hb" aria-label="Assistente" onclick="ir('assist')">💬</button><button class="hb" aria-label="Avisos" onclick="ir('avisos')">🔔</button><button onclick="carregar(true)">↻</button></div></header>
+  <header><div><h1 id="htit">Sandel</h1><small id="sub"></small><span id="sync" class="sync"></span></div><div><button class="hb mas" aria-label="Assistente" onclick="ir('assist')"><i id="masc"></i></button><button class="hb" aria-label="Avisos" onclick="ir('avisos')">🔔</button><button onclick="carregar(true)">↻</button></div></header>
   <main id="main"></main>
   <nav id="nav"></nav>
   <div id="fabw"></div>
@@ -141,7 +145,8 @@ function getStore(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
 function loading(on,txt){let e=$('#ld');if(on&&!e){e=document.createElement('div');e.id='ld';e.className='load';document.body.appendChild(e)}if(e&&on)e.textContent=txt||'Carregando…';if(!on&&e)e.remove()}
 
-const ETAPAS=[['pedido','Pedido do tecido'],['descanso','Descanso do tecido'],['infesto','Infesto'],['corte','Corte'],['amarracao','Amarração'],['embalagem','Embalagem'],['contagem','Contagem dos papagaios']];
+const ETAPAS=[['descanso','Descanso do tecido'],['infesto','Enfesto'],['corte','Corte'],['embalagem','Embalagem'],['contagem','Contagem dos papagaios']];
+const TIMED={descanso:1,infesto:1,corte:1};
 const ETN=Object.fromEntries(ETAPAS);
 const CORES={Preto:'#141414',Marrom:'#6b4226',Branco:'#f4f4f2',Marfim:'#efe6cf',Marinho:'#1f2d5a',Azul:'#2b4c9b',Rubro:'#8e1b1b',Rubi:'#9b1240',Hera:'#2f5d3a',Amarelo:'#e3c13b',Frozen:'#a9d3e6'};
 const corHex=c=>CORES[c]||'#777';
@@ -174,6 +179,8 @@ function portalDe(db,cli){return{cliente:{nome:cli.nome},config:{empresa:db.conf
 
 /* ============ CÁLCULO DO CORTE ============ */
 function tamsDe(c){return Object.keys(Object.assign({},c.enc||{},c.ret||{})).filter(t=>(+(c.enc||{})[t]||0)+(+(c.ret||{})[t]||0)>0)}
+function pk(c){const p=c.packs;return p&&typeof p==='object'?{n:+p.n||0,vol:+p.vol||0}:{n:+p||0,vol:0}}
+function volSug(c,n){const e=c.enc||{},r=c.ret||{};let v=0;Object.keys(Object.assign({},e,r)).forEach(t=>{v+=Math.ceil((+e[t]||0)/n)+Math.ceil((+r[t]||0)/n)});return v}
 function calc(c){
   const T=tamsDe(c),enc=c.enc||{},ret=c.ret||{};
   const encT=T.reduce((s,t)=>s+(+enc[t]||0),0),retT=T.reduce((s,t)=>s+(+ret[t]||0),0);
@@ -185,7 +192,7 @@ function calc(c){
   const preco=+c.preco||0,valor=Math.round(total*preco*100)/100;
   const pago=c.pago!=null?+c.pago:(c.pags||[]).reduce((s,p)=>s+(+p.valor||0),0);
   // embalagem: cada encaixe = 1 pack (peças = folhas daquele enfesto); sacos com N packs do mesmo tamanho; retalho em sacos próprios
-  const ps=+c.packs||0,sacos=[];
+  const PK=pk(c),ps=PK.n,sacos=[];
   const ensaca=(qt,f,rt)=>{if(ps)T.forEach(t=>{let packs=+qt[t]||0;while(packs>0&&f>0){const k=Math.min(ps,packs);sacos.push({tam:t,packs:k,pecas:k*f,folhas:f,ret:rt});packs-=k}})};
   ensaca(enc,folhas,false);if(retT)ensaca(ret,fret,true);
   sacos.forEach((s,i)=>{s.n=i+1});
@@ -200,8 +207,9 @@ function seqInfesto(cs){const a=(cs||[]).filter(x=>+x.rolos>0).map(x=>({cor:x.co
   return out}
 function seqHtml(cs){const q=seqInfesto(cs);if(!q.length)return'';let n=0;
   return`<div class="seq">${q.map(x=>x.sep?`<span class="sepf">${dot(x.cor)}1 folha de ${esc(x.cor)}</span>`:`<span><em>${++n}</em>${dot(x.cor)}1 rolo ${esc(x.cor)}</span>`).join('')}</div>${q.some(x=>x.sep)?'<div class="hint">“1 folha” = só uma folha dessa cor para separar, sem gastar o rolo.</div>':''}`}
-function etSt(c,e){const L=(c.log||[]).filter(x=>x.e===e),i=L.filter(x=>x.t==='i').pop(),f=L.filter(x=>x.t==='f').pop();
-  const ok=!!f&&(!i||!i.em||!f.em||f.em>=i.em);return{i,f,ok,on:!!i&&!ok}}
+// estado da etapa pela ORDEM dos lançamentos (não pelo relógio de cada celular)
+function etSt(c,e){const L=(c.log||[]).filter(x=>x.e===e),u=L[L.length-1],i=L.filter(x=>x.t==='i').pop(),f=L.filter(x=>x.t==='f').pop();
+  const ok=!!u&&u.t==='f';return{i,f,ok,on:!!u&&u.t==='i'}}
 function proxima(c){for(const[e]of ETAPAS){const s=etSt(c,e);if(!s.ok)return{e,t:s.on?'f':'i'}}return null}
 function pendOc(c){return(c.ocorr||[]).filter(o=>!o.aut&&!o.neg)}
 function status(c){
@@ -215,7 +223,7 @@ let PIN='',D=null,FILA=[],TAB='hoje',CARR=false,ENV=false;
 const DEMO_USERS={'1234':{nome:'Manuel',papel:'admin'},'5678':{nome:'Sócio',papel:'admin'},'1111':{nome:'Equipe',papel:'equipe'}};
 function demoSeed(){const cli={id:'c1',nome:'João',tel:'11999999999',preco:0.4,fora:false,chave:'joao01'},cli2={id:'c2',nome:'Thaty',tel:'',preco:0.4,fora:false,chave:'thaty01'};
   const ago=h=>new Date(Date.now()-h*3600000).toISOString();
-  return{config:{empresa:'Logari Corte',diaria:400,preco:0.4,socio:'Sócio'},clientes:[cli,cli2],
+  return{config:{empresa:'Sandel',diaria:400,preco:0.4,socio:'Sócio'},clientes:[cli,cli2],
   cortes:[{id:'k1',cod:'C-001',cli:'c1',data:hoje(),modelo:'Mula Manca',ref:'01',aprov:84.5,comp:9.8,larg:1.6,enc:{R1:10,R3:7},ret:{R1:2},retComp:1,packs:2,preco:0.4,
     cores:[{cor:'Preto',rolos:5,folhas:50,fret:5},{cor:'Marrom',rolos:5,folhas:49,fret:4},{cor:'Marfim',rolos:3,folhas:30,fret:3}],foto:'',obs:'',
     log:[{id:'l1',e:'pedido',t:'i',em:ago(30),por:'Manuel'},{id:'l2',e:'pedido',t:'f',em:ago(29),por:'Manuel'},{id:'l3',e:'descanso',t:'i',em:ago(26),por:'Equipe'},{id:'l4',e:'descanso',t:'f',em:ago(3),por:'Equipe'},{id:'l5',e:'infesto',t:'i',em:ago(2),por:'Equipe'}],
@@ -290,7 +298,7 @@ function ordena(L){return L.slice().sort((a,b)=>(b.data||'').localeCompare(a.dat
 
 /* ============ VIEW: HOJE ============ */
 function cardCorte(c,btn=true){const k=calc(c),s=status(c),cl=cliDe(c.cli),p=proxima(c);
-  let b='';if(btn&&!c.retirado){if(pendOc(c).length)b='';else if(p)b=`<button class="btn sm ${p.t==='f'?'':'sec'}" onclick="event.stopPropagation();marca('${c.id}','${p.e}','${p.t}')">${p.t==='f'?'Finalizar':'Iniciar'} ${esc(ETN[p.e].split(' ')[0])}</button>`;
+  let b='';if(btn&&!c.retirado){if(pendOc(c).length)b='';else if(p)b=`<button class="btn sm ${p.t==='f'?'':'sec'}" onclick="event.stopPropagation();marca('${c.id}','${p.e}','${p.t}')">${esc(rotEt(p.e,p.t))}</button>`;
     else if(ADM())b=`<button class="btn sm sec" onclick="event.stopPropagation();retirar('${c.id}')">Retirado</button>`}
   const saldo=ADM()&&k.saldo>0.01&&k.valor>0?`<span class="pill ${c.retirado?'bad':'pe'}">a receber ${brl(k.saldo)}</span>`:'';
   return`<div class="item" onclick="detCorte('${c.id}')"><div class="row sp"><b>${esc(c.cod)} · ${esc(cl.nome)}</b><span class="pill ${s.k}">${esc(s.t)}</span></div>
@@ -316,10 +324,14 @@ function vCortes(){const f=FC.f,q=FC.q.toLowerCase();
   ${L.length?ordena(L).map(c=>cardCorte(c)).join(''):'<div class="empty">Nada por aqui</div>'}`}
 
 /* ============ DETALHE DO CORTE ============ */
+const BUSY={};
 async function marca(id,e,t){const c=corteDe(id);if(!c)return;
-  if(e==='corte'&&t==='i'&&!calc(c).folhas&&!await pergunta('As folhas ainda não foram lançadas. Iniciar o corte mesmo assim?'))return;
-  acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t,em:new Date().toISOString(),por:D.user.nome}},false);
-  if(e==='infesto'&&t==='f')setTimeout(()=>fFolhas(id),300)}
+  const k=id+e;if(BUSY[k]&&Date.now()-BUSY[k]<2000)return;BUSY[k]=Date.now();   // evita toque duplo
+  if(e==='embalagem')return fEmb(id);
+  if(e==='contagem')return fFolhas(id,1);
+  const st=etSt(c,e);if(t==='i'&&(st.on||st.ok))return;if(t==='f'&&!st.on)return;
+  acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t,em:new Date().toISOString(),por:D.user.nome}},false)}
+function rotEt(e,t){if(e==='embalagem')return'Embalar';if(e==='contagem')return'Contar folhas';return(t==='f'?'Finalizar ':'Iniciar ')+ETN[e].split(' ')[0].toLowerCase()}
 async function pular(id,e){if(!await pergunta(`Marcar "${ETN[e]}" como feito (sem horário)?`))return;const em=new Date().toISOString();
   acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t:'f',em,por:D.user.nome,pulo:1}},false)}
 function retirar(id){const c=corteDe(id);acao('set',{tab:'cortes',id,campo:'retirado',valor:c.retirado?'':hoje()},false)}
@@ -331,9 +343,11 @@ function htmlCorte(id){const c=corteDe(id);if(!c)return'';const k=calc(c),cl=cli
   if(adm)h+=`<div class="grid3" style="margin-top:8px"><div class="st"><span class="k">Valor</span><b style="font-size:17px">${brl(k.valor)}</b></div><div class="st"><span class="k">Pago</span><b style="font-size:17px">${brl(k.pago)}</b></div><div class="st"><span class="k">Saldo</span><b style="font-size:17px;color:${k.saldo>0.01?'var(--warn)':'var(--ok)'}">${brl(k.saldo)}</b></div></div>`;
   // etapas
   h+=`<h3>Etapas</h3>`+ETAPAS.map(([e,n])=>{const st=etSt(c,e);let info='',b='';
-    if(st.ok)info=st.f.pulo?'feito':(st.i?hm(st.i.em)+' – '+hm(st.f.em)+' · '+dur(st.i.em,st.f.em)+' · '+esc(st.i.por):dhm(st.f.em))+(st.f.por&&st.i&&st.f.por!==st.i.por?' / '+esc(st.f.por):'');
+    if(st.ok)info=st.f.pulo?'feito':(TIMED[e]&&st.i?hm(st.i.em)+' – '+hm(st.f.em)+' · '+dur(st.i.em,st.f.em)+' · '+esc(st.i.por):dhm(st.f.em)+' · '+esc(st.f.por||''));
     else if(st.on)info='desde '+dhm(st.i.em)+' ('+dur(st.i.em,new Date().toISOString())+') · '+esc(st.i.por);
-    if(!c.retirado){if(st.on)b=`<button class="btn sm" onclick="marca('${id}','${e}','f')">Finalizar</button>`;else if(!st.ok)b=`<button class="btn sm sec" onclick="marca('${id}','${e}','i')">Iniciar</button>`+(adm?`<button class="x" style="color:var(--mut);font-size:13px" onclick="pular('${id}','${e}')">pular</button>`:'')}
+    if(e==='embalagem'&&st.ok){const P=pk(c);if(P.n)info+=' · '+P.n+' pack'+(P.n>1?'s':'')+'/saco · '+(P.vol||k.sacos.length)+' volumes'}
+    if(!c.retirado){if(!TIMED[e]){if(!st.ok)b=`<button class="btn sm" onclick="marca('${id}','${e}','f')">${rotEt(e,'f')}</button>`}
+      else if(st.on)b=`<button class="btn sm" onclick="marca('${id}','${e}','f')">Finalizar</button>`;else if(!st.ok)b=`<button class="btn sm sec" onclick="marca('${id}','${e}','i')">Iniciar</button>`+(adm?`<button class="x" style="color:var(--mut);font-size:13px" onclick="pular('${id}','${e}')">pular</button>`:'')}
     return`<div class="et"><div><span class="nm" style="color:${st.ok?'var(--ok)':st.on?'var(--warn)':'var(--ink)'}">${st.ok?'✓ ':st.on?'▶ ':''}${n}</span><small>${info||'—'}</small></div><div class="row">${b}</div></div>`}).join('');
   // ocorrências
   const oc=c.ocorr||[];
@@ -357,15 +371,13 @@ function htmlCorte(id){const c=corteDe(id);if(!c)return'';const k=calc(c),cl=cli
     ${k.cores.map(x=>`<tr><td>${dot(x.cor)} ${esc(x.cor)}</td><td>${x.rolos}</td><td>${x.folhas||'<span class="mut">—</span>'}</td>${k.retT?`<td>${x.fret||'<span class="mut">—</span>'}</td>`:''}${k.T.map(t=>`<td>${n0(x.p[t])}</td>`).join('')}<td><b>${n0(x.tot)}</b></td></tr>`).join('')}
     <tr class="tot"><td>Total</td><td>${k.rolos}</td><td>${k.folhas}</td>${k.retT?`<td>${k.fret}</td>`:''}${k.T.map(t=>`<td>${n0(k.porT[t])}</td>`).join('')}<td>${n0(k.total)}</td></tr></table>
     ${k.retalho?`<div class="hint">Inclui ${n0(k.retalho)} peças do retalho (${k.fret} folhas × ${k.retT}).</div>`:''}`}
-  h+=`<button class="btn ${k.folhas?'sec':''}" onclick="fFolhas('${id}')">${k.folhas?'Corrigir folhas':'Lançar folhas por cor'}</button>`;
+  if(k.folhas)h+=`<button class="btn sec" onclick="fFolhas('${id}')">Corrigir folhas</button>`;else h+=`<div class="hint">As folhas de cada cor são lançadas na contagem dos papagaios.</div>`;
   const sq=seqHtml(c.cores);if(sq)h+=`<h3>Ordem do infesto</h3>${sq}`;
   // embalagem
-  if(k.folhas){const am=etSt(c,'amarracao').ok;h+=`<h3>Embalagem</h3>`;
-   if(!am&&!c.packs)h+=`<div class="mut" style="font-size:13px">Os packs por saco são definidos depois da amarração.</div>`;
-   else h+=`<div class="lin"><span class="nm"><b>Packs por saco</b></span><div class="step"><button onclick="setPacks('${id}',${(+c.packs||1)-1})">−</button><input inputmode="numeric" value="${c.packs||0}" onchange="setPacks('${id}',num(this.value))"><button onclick="setPacks('${id}',${(+c.packs||0)+1})">+</button></div></div>`}
-  if(k.sacos.length){h+=`<div class="mut" style="font-size:13px;margin-bottom:6px">${k.sacos.length} sacos · ${c.packs} packs por saco · ${k.folhas} peças por pack${k.fret?' · retalho '+k.fret+' por pack':''}</div>
-    <table><tr><th>Saco</th><th>Tamanho</th><th>Packs</th><th>Peças</th></tr>${k.sacos.map(s=>`<tr><td>${s.n}</td><td>${esc(s.tam)}${s.ret?' <span class="pill">retalho</span>':''}</td><td>${s.packs}</td><td>${n0(s.pecas)}</td></tr>`).join('')}</table>
-    <button class="btn sec" onclick="etiquetas('${id}')">Imprimir etiquetas dos sacos</button>`}
+  {const P=pk(c);if(P.n||etSt(c,'embalagem').ok){h+=`<h3>Embalagem</h3><div class="grid2"><div class="st"><span class="k">Packs por saco</span><b>${P.n||'—'}</b></div><div class="st"><span class="k">Volumes (sacos)</span><b>${P.vol||k.sacos.length||'—'}</b></div></div>`;
+   if(k.sacos.length&&k.folhas)h+=`<table style="margin-top:8px"><tr><th>Saco</th><th>Tamanho</th><th>Packs</th><th>Peças</th></tr>${k.sacos.map(s=>`<tr><td>${s.n}</td><td>${esc(s.tam)}${s.ret?' <span class="pill">retalho</span>':''}</td><td>${s.packs}</td><td>${n0(s.pecas)}</td></tr>`).join('')}</table>
+    <button class="btn sec" onclick="etiquetas('${id}')">Imprimir etiquetas dos sacos</button>`;
+   h+=`<button class="btn sec" onclick="fEmb('${id}')">Corrigir embalagem</button>`}}
   // pagamento
   if(adm){h+=`<h3>Pagamento</h3><div class="mut" style="font-size:13px">${n0(k.total)} peças × ${brl(k.preco)} = <b class="acc">${brl(k.valor)}</b></div>`
     +((c.pags||[]).length?`<table style="margin-top:6px">${c.pags.map(p=>`<tr><td>${dbr(p.data)} · ${esc(p.forma||'')}</td><td>${brl(p.valor)} <button class="x" onclick="rmPag('${id}','${p.id}')">×</button></td></tr>`).join('')}</table>`:'')
@@ -374,7 +386,16 @@ function htmlCorte(id){const c=corteDe(id);if(!c)return'';const k=calc(c),cl=cli
   if(adm)h+=`<button class="btn sec" onclick="retirar('${id}')">${c.retirado?'Desfazer retirada':'Marcar como retirado'}</button>
     <button class="btn sec" onclick="fCorte('${id}')">Editar corte</button><button class="btn bad" onclick="excluiCorte('${id}')">Excluir corte</button>`;
   return h}
-function setPacks(id,v){v=Math.max(0,Math.round(+v||0));acao('set',{tab:'cortes',id,campo:'packs',valor:v},false)}
+let EMB=null;
+function fEmb(id){const c=corteDe(id),P=pk(c),n=P.n||2;EMB={id,n,vol:P.vol||volSug(c,n),auto:!P.vol};open_(htmlEmb())}
+function htmlEmb(){const c=corteDe(EMB.id);
+  const st=(f)=>`<div class="step"><button onclick="EMB.${f}=Math.max(1,(+EMB.${f}||1)-1);${f==='n'?'if(EMB.auto)EMB.vol=volSug(corteDe(EMB.id),EMB.n);':'EMB.auto=0;'}reopen(htmlEmb())">−</button><input inputmode="numeric" value="${EMB[f]}" onchange="EMB.${f}=Math.max(1,num(this.value));${f==='n'?'if(EMB.auto)EMB.vol=volSug(corteDe(EMB.id),EMB.n);':'EMB.auto=0;'}reopen(htmlEmb())"><button onclick="EMB.${f}=(+EMB.${f}||0)+1;${f==='n'?'if(EMB.auto)EMB.vol=volSug(corteDe(EMB.id),EMB.n);':'EMB.auto=0;'}reopen(htmlEmb())">+</button></div>`;
+  return`<h2>Embalagem</h2><div class="mut">${esc(c.cod)} · ${esc(c.modelo||'')}</div>
+  <div class="lin" style="margin-top:14px"><span class="nm"><b>Quantos packs em cada saco?</b></span>${st('n')}</div>
+  <div class="lin"><span class="nm"><b>Quantos sacos (volumes)?</b></span>${st('vol')}</div>
+  <button class="btn" onclick="salvaEmb()">Finalizar embalagem</button>`}
+function salvaEmb(){const E=EMB,c=corteDe(E.id);acao('set',{tab:'cortes',id:E.id,campo:'packs',valor:{n:E.n,vol:E.vol}},false);
+  if(!etSt(c,'embalagem').ok)acao('push',{tab:'cortes',id:E.id,campo:'log',item:{id:uid(),e:'embalagem',t:'f',em:new Date().toISOString(),por:D.user.nome}},false);close_()}
 async function excluiCorte(id){const c=corteDe(id);if(!await pergunta(`Excluir o corte ${c.cod}? Isso não tem volta.`))return;acao('del',{tab:'cortes',id})}
 
 /* ============ FOTOS ============ */
@@ -396,13 +417,14 @@ function htmlForm(){const F=FORM,adm=ADM(),k=calc(Object.assign({},F,{enc:pick(F
   return`<h2>${F._novo?'Novo corte':'Editar '+esc(F.cod)}</h2><div class="mut">${esc(F.cod)}</div>
   <label>Cliente</label><select onchange="FORM.cli=this.value;if(this.value!=='__novo'){const c=cliDe(this.value);if(c.preco!=null&&FORM._novo)FORM.preco=c.preco}reopen(htmlForm())">
     <option value="">Escolha…</option>${cls.map(c=>`<option value="${c.id}" ${F.cli===c.id?'selected':''}>${esc(c.nome)}</option>`).join('')}<option value="__novo" ${F.cli==='__novo'?'selected':''}>+ Novo cliente</option></select>
-  ${F.cli==='__novo'?`<label>Nome do novo cliente</label><input value="${esc(F._nnome||'')}" oninput="FORM._nnome=this.value"><label>WhatsApp</label><input inputmode="tel" value="${esc(F._ntel||'')}" oninput="FORM._ntel=this.value">`:''}
+  ${F.cli==='__novo'?`<label>Nome do novo cliente</label><input value="${esc(F._nnome||'')}" oninput="FORM._nnome=this.value">`:''}
   <label>Data do corte</label><input type="date" value="${F.data}" onchange="FORM.data=this.value">
   <h3>Risco</h3>
-  <button class="btn sec" onclick="$('#frisco').click()">📷 Foto do risco (lê os dados sozinho)</button>
-  <input id="frisco" type="file" accept="image/*" style="display:none" onchange="lerRisco(this.files[0])">
+  <div class="k" style="margin-top:4px">Foto do risco (lê os dados sozinho)</div>
+  <div class="duo"><button class="btn sec" onclick="$('#friscoC').click()">📷 Câmera</button><button class="btn sec" onclick="$('#friscoA').click()">🖼 Arquivos</button></div>
+  <input id="friscoC" type="file" accept="image/*" capture="environment" style="display:none" onchange="lerRisco(this.files[0])"><input id="friscoA" type="file" accept="image/*" style="display:none" onchange="lerRisco(this.files[0])">
   ${F._fotoB64?`<img class="ft" src="${F._fotoB64}">`:F.foto?`<img class="ft" data-foto="${esc(F.foto)}">`:''}
-  <div class="grid2"><div><label>Modelo (nome interno)</label><input value="${esc(F.modelo)}" oninput="FORM.modelo=this.value"></div><div><label>Ref. do risco</label><input value="${esc(F.ref)}" oninput="FORM.ref=this.value"></div></div>
+  <div class="grid2"><div><label>Modelo</label><input value="${esc(F.modelo)}" oninput="FORM.modelo=this.value"></div><div><label>Ref. do risco</label><input value="${esc(F.ref)}" oninput="FORM.ref=this.value"></div></div>
   <div class="grid3"><div><label>Aprov. %</label><input inputmode="decimal" value="${F.aprov}" oninput="FORM.aprov=num(this.value)"></div><div><label>Compr. m</label><input inputmode="decimal" value="${F.comp}" oninput="FORM.comp=num(this.value)"></div><div><label>Largura m</label><input inputmode="decimal" value="${F.larg}" oninput="FORM.larg=num(this.value)"></div></div>
   <label>Encaixes por tamanho</label>
   ${F._tams.map((t,i)=>`<div class="lin"><span class="nm"><b>${esc(t)}</b></span><div class="row">${stepper('enc',t)}<button class="x" onclick="FORM._tams.splice(${i},1);delete FORM.enc['${esc(t)}'];delete FORM.ret['${esc(t)}'];reopen(htmlForm())">×</button></div></div>`).join('')}
@@ -470,24 +492,27 @@ function parseRisco(t){const o={},T=t.replace(/\r/g,'');const f=re=>{const m=T.m
 
 /* ============ FOLHAS, OCORRÊNCIA, PAGAMENTO ============ */
 let FOL=null;
-function fFolhas(id){const c=corteDe(id);if(!c)return;FOL={id,cores:JSON.parse(JSON.stringify(c.cores||[]))};open_(htmlFolhas())}
+function fFolhas(id,cont){const c=corteDe(id);if(!c)return;FOL={id,cont:!!cont,cores:JSON.parse(JSON.stringify(c.cores||[]))};open_(htmlFolhas())}
 function stFol(i,campo){const v=FOL.cores[i][campo]||0,r=`FOL.cores[${i}].${campo}`;
   return`<div class="step"><button onclick="${r}=Math.max(0,(+${r}||0)-1);reopen(htmlFolhas())">−</button><input inputmode="numeric" value="${v}" onchange="${r}=num(this.value);reopen(htmlFolhas())"><button onclick="${r}=(+${r}||0)+1;reopen(htmlFolhas())">+</button></div>`}
 function htmlFolhas(){const c=corteDe(FOL.id),k=calc(Object.assign({},c,{cores:FOL.cores}));
-  return`<h2>Folhas por cor</h2><div class="mut">${esc(c.cod)} · ${esc(c.modelo)} · risco ${k.encT} pç/folha${k.retT?' · retalho '+k.retT+' pç/folha':''}</div>
+  return`<h2>${FOL.cont?'Contagem dos papagaios':'Folhas por cor'}</h2><div class="mut">${esc(c.cod)} · ${esc(c.modelo)} · risco ${k.encT} pç/folha${k.retT?' · retalho '+k.retT+' pç/folha':''}</div>
   <label>Folhas do risco principal</label>
   ${FOL.cores.map((x,i)=>`<div class="lin"><span class="nm">${dot(x.cor)}<b>${esc(x.cor)}</b><span class="mut" style="font-size:12px">${x.rolos} rolos</span></span>${stFol(i,'folhas')}</div>`).join('')}
   ${k.retT?`<label>Folhas do retalho${c.retComp?' ('+n1(c.retComp)+' m)':''}</label>${FOL.cores.map((x,i)=>`<div class="lin"><span class="nm">${dot(x.cor)}<b>${esc(x.cor)}</b></span>${stFol(i,'fret')}</div>`).join('')}`:''}
   <div class="card" style="margin-top:10px"><div class="row sp"><span class="k">Peças</span><b class="big acc">${n0(k.total)}</b></div>
   ${k.T.map(t=>`<div class="row sp"><span>${esc(t)}</span><b>${n0(k.porT[t])}</b></div>`).join('')}
   ${k.retT?`<div class="hint">Principal ${n0(k.folhas)} folhas × ${k.encT} = ${n0(k.folhas*k.encT)} · Retalho ${n0(k.fret)} × ${k.retT} = ${n0(k.retalho)}</div>`:''}</div>
-  <button class="btn" onclick="acao('set',{tab:'cortes',id:FOL.id,campo:'cores',valor:FOL.cores})">Salvar folhas</button>`}
+  <button class="btn" onclick="salvaFol()">${FOL.cont?'Finalizar contagem':'Salvar folhas'}</button>`}
+function salvaFol(){const F=FOL,c=corteDe(F.id);acao('set',{tab:'cortes',id:F.id,campo:'cores',valor:F.cores},false);
+  if(F.cont&&!etSt(c,'contagem').ok)acao('push',{tab:'cortes',id:F.id,campo:'log',item:{id:uid(),e:'contagem',t:'f',em:new Date().toISOString(),por:D.user.nome}},false);close_()}
 let OC=null;
 function fOcorr(id){OC={id,desc:'',fotos:[]};open_(htmlOc())}
 function htmlOc(){return`<h2>Ocorrência no tecido</h2><div class="mut">Sujeira, estria, mancha… O corte fica parado até o cliente autorizar.</div>
   <label>O que foi encontrado</label><input value="${esc(OC.desc)}" oninput="OC.desc=this.value" placeholder="Ex.: estria no rolo marrom 3">
   <div class="thumbs">${OC.fotos.map(b=>`<img src="${b}">`).join('')}</div>
-  <button class="btn sec" onclick="$('#foc').click()">📷 Foto / vídeo (foto)</button><input id="foc" type="file" accept="image/*" multiple style="display:none" onchange="addOc(this.files)">
+  <div class="duo"><button class="btn sec" onclick="$('#focC').click()">📷 Câmera</button><button class="btn sec" onclick="$('#focA').click()">🖼 Arquivos</button></div>
+  <input id="focC" type="file" accept="image/*" capture="environment" style="display:none" onchange="addOc(this.files)"><input id="focA" type="file" accept="image/*" multiple style="display:none" onchange="addOc(this.files)">
   <button class="btn" onclick="salvaOc()">Registrar</button>`}
 async function addOc(fs){for(const f of[...fs]){try{OC.fotos.push(await reduzir(f,1200,.78))}catch(e){}}reopen(htmlOc())}
 async function salvaOc(){if(!OC.desc&&!OC.fotos.length)return toast('Descreva ou fotografe');const ids=[];
@@ -515,33 +540,58 @@ async function compartilha(t,files,tel){files=files||[];
 /* ============ PDF ============ */
 async function jspdf(){await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');await loadScript('https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js');return window.jspdf.jsPDF}
 function imgDim(b){return new Promise(ok=>{const i=new Image();i.onload=()=>ok([i.width,i.height]);i.onerror=()=>ok([4,3]);i.src=b})}
-async function pdfCliente(id,c){c=c||corteDe(id);loading(true,'Gerando PDF…');try{
-  const J=await jspdf(),doc=new J({unit:'mm',format:'a4'}),k=calc(c),cl=PORTAL?PDATA.cliente:cliDe(c.cli),emp=(PORTAL?PDATA.config.empresa:D.config.empresa)||'Corte';
-  const G=[184,144,79],W=210;let y=16;
-  doc.setFillColor(15,14,13);doc.rect(0,0,W,28,'F');doc.setTextColor(...G);doc.setFont('times','bold');doc.setFontSize(20);doc.text(emp.toUpperCase(),14,17);
-  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(220,210,190);doc.text('Especificação do corte',W-14,12,{align:'right'});doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text(c.cod,W-14,21,{align:'right'});
-  y=38;doc.setTextColor(30,30,30);doc.setFontSize(11);doc.setFont('helvetica','normal');
-  const info=[['Cliente',cl.nome],['Data do corte',dbrY(c.data)],['Modelo',(c.modelo||'')+(c.ref?' · risco '+c.ref:'')],['Status',status(c).t]];
-  info.forEach(([a,b],i)=>{const x=14+(i%2)*92,yy=y+Math.floor(i/2)*7;doc.setTextColor(120);doc.text(a+':',x,yy);doc.setTextColor(20);doc.text(String(b||''),x+28,yy)});y+=18;
-  const T={theme:'grid',styles:{fontSize:9.5,cellPadding:2},headStyles:{fillColor:[34,31,27],textColor:G},margin:{left:14,right:14}};
-  doc.autoTable(Object.assign({},T,{startY:y,head:[['Risco','']],body:[['Aproveitamento',c.aprov?n1(c.aprov)+'%':'—'],['Comprimento × largura',(c.comp?n1(c.comp)+' m':'—')+' × '+(c.larg?n1(c.larg)+' m':'—')],['Encaixes',k.T.filter(t=>+(c.enc||{})[t]).map(t=>c.enc[t]+' '+t).join(' + ')+' = '+k.encT],...(k.retT?[['Risco de retalho',(c.retComp?n1(c.retComp)+' m · ':'')+k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+' '+t).join(' + ')+' = '+k.retT]]:[])],columnStyles:{0:{cellWidth:60}}}));
-  y=doc.lastAutoTable.finalY+5;
-  const ft=c.foto?await getFoto(c.foto):'';
-  if(ft){const[w,h]=await imgDim(ft);let iw=182,ih=iw*h/w;if(ih>80){ih=80;iw=ih*w/h}if(y+ih>280){doc.addPage();y=16}doc.addImage(ft,'JPEG',14,y,iw,ih);y+=ih+5}
-  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(30);doc.text('Peças por cor e tamanho',14,y+3);y+=6;doc.setFont('helvetica','normal');
-  doc.autoTable(Object.assign({},T,{startY:y,head:[['Cor','Rolos','Folhas',...(k.retT?['Folhas ret.']:[]),...k.T,'Total']],body:k.cores.map(x=>[x.cor,x.rolos,x.folhas,...(k.retT?[x.fret]:[]),...k.T.map(t=>n0(x.p[t])),n0(x.tot)]),
-    foot:[['Total',k.rolos,k.folhas,...(k.retT?[k.fret]:[]),...k.T.map(t=>n0(k.porT[t])),n0(k.total)]],footStyles:{fillColor:[240,234,222],textColor:20,fontStyle:'bold'}}));
-  y=doc.lastAutoTable.finalY+2;if(k.retalho){doc.setFontSize(8.5);doc.setTextColor(110);doc.text('Inclui '+n0(k.retalho)+' peças do risco de retalho ('+k.fret+' folhas × '+k.retT+' encaixes).',14,y+4);y+=6}
-  if(k.sacos.length&&k.folhas){doc.autoTable(Object.assign({},T,{startY:y+4,head:[['Saco','Tamanho','Packs','Peças']],body:k.sacos.map(s=>[s.n+' de '+k.sacos.length,s.tam+(s.ret?' (retalho)':''),s.packs,n0(s.pecas)])}));y=doc.lastAutoTable.finalY}
-  const oa=(c.ocorr||[]).filter(o=>o.aut);
-  if(oa.length){doc.autoTable(Object.assign({},T,{startY:y+5,head:[['Ocorrência no tecido (autorizada pelo cliente)','Autorizado em']],body:oa.map(o=>[o.desc||'—',dbrY(o.aut)])}));y=doc.lastAutoTable.finalY}
-  if(k.valor>0){const pago=k.pago;doc.autoTable(Object.assign({},T,{startY:y+5,head:[['Valor do corte','']],body:[[n0(k.total)+' peças × '+brl(k.preco),brl(k.valor)],...(pago?[['Pago',brl(pago)],['Saldo',brl(k.saldo)]]:[])],columnStyles:{1:{halign:'right',fontStyle:'bold'}}}))}
-  const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(150);doc.text(emp+' · '+c.cod+' · página '+i+'/'+n,W/2,290,{align:'center'})}
-  const blob=doc.output('blob'),file=new File([blob],`Corte ${c.cod} - ${cl.nome}.pdf`,{type:'application/pdf'});loading(false);
-  const tel=PORTAL?'':cliDe(c.cli).tel;
-  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:`Especificação do corte ${c.cod}`});return}catch(e){if(e.name==='AbortError')return}}
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();if(tel&&!PORTAL)toast('PDF baixado — anexe no WhatsApp')
-  }catch(e){loading(false);toast(e.message)}}
+async function pdfCliente(id,c){c=c||corteDe(id);loading(true,'Gerando PDF…');let file;try{
+  const J=await jspdf(),doc=new J({unit:'mm',format:'a4',orientation:'portrait'}),k=calc(c),cl=PORTAL?PDATA.cliente:cliDe(c.cli),cfg=(PORTAL?PDATA.config:D.config)||{},P=pk(c);
+  const G=[184,144,79],W=210,M=14;let y;
+  doc.setFillColor(15,14,13);doc.rect(0,0,W,30,'F');doc.setTextColor(...G);doc.setFont('times','bold');doc.setFontSize(24);doc.text('SANDEL',M,18);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(220,210,190);doc.text('CORTE · ESPECIFICAÇÃO',M,25);
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text(c.cod,W-M,17,{align:'right'});doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text(dbrY(c.data),W-M,24,{align:'right'});
+  doc.setTextColor(25);doc.setFontSize(12);doc.setFont('helvetica','bold');doc.text(cl.nome||'',M,40);doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(110);doc.text((c.modelo||'')+(c.ref?' · risco '+c.ref:''),M,46);
+  y=52;
+  const T={theme:'plain',styles:{fontSize:10.5,cellPadding:{top:1.8,bottom:1.8,left:2,right:2},textColor:25,lineColor:[225,218,205],lineWidth:{bottom:.2}},headStyles:{fillColor:[34,31,27],textColor:G,fontStyle:'bold',fontSize:10},footStyles:{fillColor:[240,234,222],textColor:20,fontStyle:'bold'},margin:{left:M,right:M},columnStyles:{1:{halign:'right'},2:{halign:'right'},3:{halign:'right'}}};
+  const sec=(titulo,head,body,foot,extra)=>{if(y>250){doc.addPage();y=16}doc.setFont('helvetica','bold');doc.setFontSize(11.5);doc.setTextColor(...G);doc.text(titulo.toUpperCase(),M,y+4);y+=7;
+    const cs=Object.assign({},T.columnStyles,(extra&&extra.columnStyles)||{});
+    doc.autoTable(Object.assign({},T,{startY:y,head:head?[head]:undefined,body,foot:foot?[foot]:undefined,didParseCell:d=>{if(d.section!=='body'){const al=(cs[d.column.index]||{}).halign;d.cell.styles.halign=d.column.index===0?'left':(al||'left')}}},extra||{}));y=doc.lastAutoTable.finalY+8};
+  // 1. risco
+  const enc=k.T.filter(t=>+(c.enc||{})[t]).map(t=>c.enc[t]+'x '+t).join(' + ');
+  sec('Informações do risco',null,[['Modelo',(c.modelo||'—')+(c.ref?' · ref '+c.ref:'')],['Aproveitamento',c.aprov?n1(c.aprov)+'%':'—'],['Comprimento',c.comp?n1(c.comp)+' m':'—'],['Largura',c.larg?n1(c.larg)+' m':'—'],['Encaixes',(enc||'—')+(k.encT?' = '+k.encT+' peças por folha':'')],
+    ...(k.retT?[['Risco de retalho',(c.retComp?n1(c.retComp)+' m · ':'')+k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+'x '+t).join(' + ')+' = '+k.retT+' por folha']]:[])],null,{columnStyles:{0:{cellWidth:55,textColor:110},1:{halign:'left'}}});
+  let ft='';try{ft=c.foto?await getFoto(c.foto):''}catch(e){}
+  if(ft){try{const[w,h]=await imgDim(ft);let iw=182,ih=iw*h/w;if(ih>70){ih=70;iw=ih*w/h}if(y+ih>275){doc.addPage();y=16}doc.addImage(ft,'JPEG',M,y,iw,ih);y+=ih+8}catch(e){}}
+  // 2. rolos
+  sec('Rolos no corte',['Cor','Rolos'],k.cores.map(x=>[x.cor,x.rolos]),['Total',k.rolos]);
+  // 3. folhas
+  sec('Folhas',k.retT?['Cor','Folhas','Folhas de retalho']:['Cor','Folhas'],k.cores.map(x=>k.retT?[x.cor,x.folhas,x.fret]:[x.cor,x.folhas]),k.retT?['Total',k.folhas,k.fret]:['Total',k.folhas]);
+  // 4. peças por cor e tamanho (lista vertical)
+  const body=[];k.cores.forEach(x=>{k.T.forEach(t=>{if(x.p[t])body.push([x.cor,t,n0(x.p[t])])});body.push([{content:'Subtotal '+x.cor,colSpan:2,styles:{fontStyle:'bold',textColor:90}},{content:n0(x.tot),styles:{fontStyle:'bold'}}])});
+  sec('Peças por cor e tamanho',['Cor','Tamanho','Peças'],body,null,{columnStyles:{1:{halign:'left'},2:{halign:'right'}}});
+  if(k.T.length>1)sec('Peças por tamanho',['Tamanho','Peças'],k.T.map(t=>[t,n0(k.porT[t])]));
+  // 5. total
+  if(y>255){doc.addPage();y=16}
+  doc.setFillColor(240,234,222);doc.rect(M,y,W-2*M,16,'F');doc.setTextColor(25);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('TOTAL DE PEÇAS',M+4,y+10.5);doc.setFontSize(18);doc.text(n0(k.total),W-M-4,y+11,{align:'right'});y+=24;
+  if(k.retalho){doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(110);doc.text('Inclui '+n0(k.retalho)+' peças do retalho ('+k.fret+' folhas × '+k.retT+').',M,y-4);y+=2}
+  // 6. embalagem
+  if(P.n||etSt(c,'embalagem').ok)sec('Embalagem',null,[['Volumes (sacos)',String(P.vol||k.sacos.length||'—')],['Packs por saco',String(P.n||'—')]],null,{columnStyles:{0:{textColor:110}}});
+  // ocorrências autorizadas
+  const oa=(c.ocorr||[]).filter(o=>o.aut);if(oa.length)sec('Ocorrências autorizadas pelo cliente',['Ocorrência','Autorizado em'],oa.map(o=>[o.desc||'—',dbrY(o.aut)]));
+  // 7. valor
+  if(k.valor>0)sec('Valor do corte',null,[[n0(k.total)+' peças × '+brl(k.preco),brl(k.valor)],...(k.pago?[['Pago',brl(k.pago)],['Saldo a pagar',brl(k.saldo)]]:[])],null,{columnStyles:{0:{textColor:90},1:{halign:'right',fontStyle:'bold'}}});
+  // 8. pagamento
+  if(cfg.pix){if(y>255){doc.addPage();y=16}doc.setFont('helvetica','bold');doc.setFontSize(11.5);doc.setTextColor(...G);doc.text('PAGAMENTO',M,y+4);y+=8;
+    doc.setDrawColor(...G);doc.setLineWidth(.4);doc.roundedRect(M,y,W-2*M,cfg.pixnome?20:14,2,2);doc.setTextColor(25);doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('Chave PIX',M+4,y+6);
+    doc.setFont('helvetica','bold');doc.setFontSize(12.5);doc.text(String(cfg.pix),M+4,y+11.5);if(cfg.pixnome){doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(90);doc.text('Favorecido: '+cfg.pixnome,M+4,y+17)}y+=26}
+  const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(150);doc.setFont('helvetica','normal');doc.text('Sandel · '+c.cod+' · página '+i+'/'+n,W/2,290,{align:'center'})}
+  const blob=doc.output('blob');file=new File([blob],`Corte ${c.cod} - ${cl.nome}.pdf`,{type:'application/pdf'});
+  }catch(e){loading(false);return toast('Não gerou o PDF: '+e.message)}
+  loading(false);PDFF=file;
+  // o envio precisa de um toque novo na tela (regra do celular)
+  const pode=navigator.canShare&&navigator.canShare({files:[file]});
+  const ov=document.createElement('div');ov.className='sheet';ov.style.zIndex=48;ov.innerHTML=`<div><h2>PDF pronto</h2><div class="mut">${esc(file.name)}</div>
+   ${pode?`<button class="btn wa" id="pdfS">Enviar (WhatsApp e outros)</button>`:''}<button class="btn ${pode?'sec':''}" id="pdfB">Baixar / abrir PDF</button><button class="btn sec" id="pdfX">Fechar</button></div>`;
+  document.body.appendChild(ov);const fecha=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)fecha()};$('#pdfX').onclick=fecha;
+  if(pode)$('#pdfS').onclick=async()=>{try{await navigator.share({files:[PDFF],title:PDFF.name})}catch(e){if(e.name!=='AbortError')toast('Não deu para compartilhar: '+e.message)}};
+  $('#pdfB').onclick=()=>{const u=URL.createObjectURL(PDFF);const a=document.createElement('a');a.href=u;a.download=PDFF.name;a.target='_blank';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>{try{window.open(u,'_blank')}catch(e){}},400)}}
+let PDFF=null;
 async function etiquetas(id){const c=corteDe(id),k=calc(c),cl=cliDe(c.cli);loading(true,'Gerando etiquetas…');try{
   const J=await jspdf(),doc=new J({unit:'mm',format:'a4'}),w=95,h=54,mx=10,my=11;
   k.sacos.forEach((s,i)=>{const p=i%10;if(i&&!p)doc.addPage();const x=mx+(p%2)*w,y=my+Math.floor(p/2)*h;
@@ -565,17 +615,17 @@ function vClientes(){const L=(D.clientes||[]).slice().sort((a,b)=>a.nome.localeC
     <div class="mut">${cs.length} corte${cs.length!==1?'s':''} · ${n0(pc)} peças${ADM()&&c.preco!=null?' · '+brl(c.preco)+'/pç':''}${c.fora?' · tecido de fora':''}</div></button>`}).join('')}
 function linkPortal(c){return location.href.split('?')[0].split('#')[0]+'?c='+c.chave}
 function detCliente(id){const c=cliDe(id),cs=ordena(D.cortes.filter(x=>x.cli===id));
-  open_(`<h2>${esc(c.nome)}</h2><div class="mut">${c.tel?esc(c.tel):'sem telefone'}${c.fora?' · traz tecido de fora':''}</div>
+  open_(`<h2>${esc(c.nome)}</h2><div class="mut">${c.fora?'traz tecido de fora':''}</div>
   ${ADM()?`<button class="btn wa" onclick="enviaLink('${id}')">Enviar link de acompanhamento</button><button class="btn sec" onclick="fCliente('${id}')">Editar cliente</button>`:''}
   <h3>Cortes</h3>${cs.length?cs.map(x=>cardCorte(x,false)).join(''):'<div class="mut">Nenhum corte</div>'}`)}
 function enviaLink(id){const c=cliDe(id);compartilha(`Olá, ${c.nome}! Por este link você acompanha seus cortes e baixa o PDF de cada um: ${linkPortal(c)}`,[],c.tel)}
 function fCliente(id){const c=id?cliDe(id):{nome:'',tel:'',preco:D.config.preco||0.4,fora:false};
-  open_(`<h2>${id?'Editar cliente':'Novo cliente'}</h2><label>Nome</label><input id="cn" value="${esc(c.nome)}"><label>WhatsApp</label><input id="ct" inputmode="tel" value="${esc(c.tel||'')}">
+  open_(`<h2>${id?'Editar cliente':'Novo cliente'}</h2><label>Nome</label><input id="cn" value="${esc(c.nome)}">
   <label>Preço do corte por peça (R$)</label><input id="cp" inputmode="decimal" value="${m2(c.preco)}" onblur="this.value=m2(num(this.value))"><div class="hint">Padrão R$ 0,40 para quem compra o tecido com vocês. Peças maiores podem ter preço próprio no corte.</div>
   <label class="row" style="margin-top:14px;gap:10px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink)"><input id="cf" type="checkbox" style="width:22px;height:22px;accent-color:var(--acc)" ${c.fora?'checked':''}> Traz tecido de fora</label>
   <button class="btn" onclick="salvaCli('${id||''}')">Salvar</button>${id&&!D.cortes.some(x=>x.cli===id)?`<button class="btn bad" onclick="(async()=>{if(await pergunta('Excluir cliente?'))acao('del',{tab:'clientes',id:'${id}'})})()">Excluir</button>`:''}`)}
 function salvaCli(id){const nm=$('#cn').value.trim();if(!nm)return toast('Nome');const old=id?cliDe(id):{};
-  const rec=Object.assign({},old,{id:id||uid(),nome:nm,tel:$('#ct').value.replace(/\D/g,''),preco:num($('#cp').value)||0,fora:$('#cf').checked,chave:old.chave||chave()});
+  const rec=Object.assign({},old,{id:id||uid(),nome:nm,tel:old.tel||'',preco:num($('#cp').value)||0,fora:$('#cf').checked,chave:old.chave||chave()});
   acao('put',{tab:'clientes',rec})}
 
 /* ============ CAIXA (só sócios) ============ */
@@ -606,7 +656,8 @@ function vCaixa(){const[a,b]=faixa(),inR=d=>d&&d>=a&&d<=b,cfg=D.config;
   <div class="card"><div class="grid2"><div><label style="margin-top:0">Diária equipe</label><input inputmode="decimal" value="${m2(cfg.diaria??400)}" onchange="acao('cfg',{k:'diaria',v:num(this.value)},false)"></div>
   <div><label style="margin-top:0">Preço padrão/pç</label><input inputmode="decimal" value="${m2(cfg.preco??0.4)}" onchange="acao('cfg',{k:'preco',v:num(this.value)},false)"></div>
   <div><label>Nome do sócio</label><input value="${esc(cfg.socio||'')}" onchange="acao('cfg',{k:'socio',v:this.value},false)"></div>
-  <div><label>Nome no PDF</label><input value="${esc(cfg.empresa||'')}" onchange="acao('cfg',{k:'empresa',v:this.value},false)"></div>
+  <div style="grid-column:1/-1"><label>Chave PIX (vai no PDF)</label><input value="${esc(cfg.pix||'')}" onchange="acao('cfg',{k:'pix',v:this.value.trim()},false)"></div>
+  <div style="grid-column:1/-1"><label>Nome do favorecido do PIX</label><input value="${esc(cfg.pixnome||'')}" onchange="acao('cfg',{k:'pixnome',v:this.value.trim()},false)"></div>
 </div>
   <button class="btn sec" onclick="sair()">Sair deste aparelho</button></div>`}
 async function diaria(){const v=+D.config.diaria||400;if((D.despesas||[]).some(x=>x.data===hoje()&&x.tipo==='Diária equipe')&&!await pergunta('Já tem diária lançada hoje. Lançar outra?'))return;
@@ -621,7 +672,7 @@ let PORTAL='',PDATA=null;
 async function portal(chave){PORTAL=chave;$('#login').style.display='none';$('#app').style.display='block';$('#nav').style.display='none';$('.fab')&&$('.fab').remove();
   $('header button').onclick=()=>portal(chave);
   try{loading(true);const r=await post('portal',{chave});PDATA=r.data;store('cor_p_'+chave,JSON.stringify(PDATA))}catch(e){try{PDATA=JSON.parse(getStore('cor_p_'+chave))}catch(_){}if(!PDATA){loading(false);$('#main').innerHTML='<div class="empty">'+esc(e.message)+'</div>';return}}finally{loading(false)}
-  $('#htit').textContent=PDATA.config.empresa||'Corte';$('#sub').textContent=PDATA.cliente.nome;
+  $('#htit').textContent='Sandel';$('#sub').textContent=PDATA.cliente.nome;
   const L=ordena(PDATA.cortes);
   $('#main').innerHTML=`<div class="mid" style="margin:4px 0 12px">Olá, ${esc(PDATA.cliente.nome)}</div>`+(L.length?L.map(c=>{const k=calc(c),s=status(c);
     return`<div class="card"><div class="row sp"><b class="mid">${esc(c.cod)}</b><span class="pill ${s.k}">${esc(s.t)}</span></div>
@@ -630,6 +681,14 @@ async function portal(chave){PORTAL=chave;$('#login').style.display='none';$('#a
     ${k.total?`<table style="margin-top:10px"><tr><th>Cor</th>${k.T.map(t=>`<th>${esc(t)}</th>`).join('')}<th>Total</th></tr>${k.cores.map(x=>`<tr><td>${dot(x.cor)} ${esc(x.cor)}</td>${k.T.map(t=>`<td>${n0(x.p[t])}</td>`).join('')}<td><b>${n0(x.tot)}</b></td></tr>`).join('')}<tr class="tot"><td>Total</td>${k.T.map(t=>`<td>${n0(k.porT[t])}</td>`).join('')}<td>${n0(k.total)}</td></tr></table>`:''}
     <button class="btn sec" onclick="pdfCliente('',PDATA.cortes.find(x=>x.id==='${c.id}'))">Baixar PDF</button></div>`}).join(''):'<div class="empty">Nenhum corte ainda</div>')}
 
+/* ============ MASCOTE (rolo de tecido) ============ */
+function mascote(cl){return`<svg viewBox="0 0 64 64" ${cl?`class="${cl}"`:''} aria-hidden="true"><defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b26c"/><stop offset="1" stop-color="#9c7637"/></linearGradient></defs>
+<path d="M44 40 L60 40 L58 58 L42 56 Z" fill="#7a5a28"/><path d="M44 40 L60 40 L58 58" fill="none" stroke="#e6c88a" stroke-width="1.2"/>
+<circle cx="28" cy="34" r="22" fill="url(#mg)" stroke="#f0d9a6" stroke-width="1.5"/><circle cx="28" cy="34" r="15" fill="none" stroke="#7a5a28" stroke-width="1.4" opacity=".55"/><circle cx="28" cy="34" r="8.5" fill="none" stroke="#7a5a28" stroke-width="1.4" opacity=".45"/>
+<circle cx="21" cy="30" r="3.2" fill="#15120e"/><circle cx="35" cy="30" r="3.2" fill="#15120e"/><circle cx="22" cy="29" r="1" fill="#fff"/><circle cx="36" cy="29" r="1" fill="#fff"/>
+<path d="M21 39 Q28 45 35 39" fill="none" stroke="#15120e" stroke-width="2.4" stroke-linecap="round"/><circle cx="16" cy="37" r="2.4" fill="#e08a6a" opacity=".55"/><circle cx="40" cy="37" r="2.4" fill="#e08a6a" opacity=".55"/>
+<path d="M14 12 Q28 2 42 12" fill="none" stroke="#15120e" stroke-width="2.2" stroke-linecap="round"/><circle cx="28" cy="6" r="2.4" fill="#15120e"/></svg>`}
+(function(){const m=document.getElementById('masc');if(m)m.outerHTML=mascote()})();
 /* ============ CAMPOS NUMÉRICOS ============ */
 document.addEventListener('focusin',e=>{const t=e.target;if(t.tagName!=='INPUT'||!/numeric|decimal/.test(t.inputMode||'')||t.type==='password')return;
   if(num(t.value)===0)t.value='';else setTimeout(()=>{try{t.select();t.setSelectionRange(0,t.value.length)}catch(_){}},0)});
@@ -688,14 +747,25 @@ function chSave(){store('cor_chat_'+PIN,JSON.stringify(CH.slice(-40)))}
 function sugestoes(){return ['Em produção','Prontos para retirar','Esperando o cliente','Peças hoje'].concat(ADM()?['Quem me deve?','Caixa do mês']:[]).concat(['Limpar conversa'])}
 function vAssist(){chLoad();
   let h=`<button class="tg" onclick="ir('hoje')">‹ Voltar</button><div class="chat">`;
-  if(!CH.length)h+=`<div class="msg bot"><h4>Assistente do corte</h4>Pergunte do seu jeito. Exemplos:<br>• <b>o que está em produção</b><br>• <b>prontos para retirar</b><br>• <b>peças hoje</b> ou <b>peças da semana</b><br>• o nome de um cliente ou o código de um corte${ADM()?'<br>• <b>quem me deve</b> · <b>caixa do mês</b>':''}</div>`;
-  h+=CH.map(m=>`<div class="msg ${m.eu?'eu':'bot'}">${m.eu?esc(m.t):m.h}</div>`).join('')+'</div>';
-  h+=`<div class="cbar"><div class="sg">${sugestoes().map(t=>`<button onclick="pergAssist('${t}')">${t}</button>`).join('')}</div><form onsubmit="event.preventDefault();const i=$('#cq');const v=i.value;i.value='';pergAssist(v)"><input id="cq" placeholder="Pergunte algo…" autocomplete="off" enterkeyhint="send"><button>Enviar</button></form></div>`;
+  if(!CH.length)h+=`<div class="bav">${mascote()}<div class="msg bot"><h4>Sandel, seu assistente do corte</h4>Pergunte do seu jeito. Exemplos:<br>• <b>o que está em produção</b><br>• <b>prontos para retirar</b><br>• <b>peças hoje</b> ou <b>peças da semana</b><br>• o nome de um cliente ou o código de um corte${ADM()?'<br>• <b>quem me deve</b> · <b>caixa do mês</b>':''}<br><br>Toque no microfone 🎤 para falar.</div></div>`;
+  h+=CH.map(m=>m.eu?`<div class="msg eu">${esc(m.t)}</div>`:`<div class="bav">${mascote()}<div class="msg bot">${m.h}</div></div>`).join('')+'</div>';
+  h+=`<div class="cbar"><div class="sg">${sugestoes().map(t=>`<button onclick="pergAssist('${t}')">${t}</button>`).join('')}</div><form onsubmit="event.preventDefault();const i=$('#cq');const v=i.value;i.value='';pergAssist(v)"><button type="button" class="mic${OUVINDO?' on':''}" onclick="falar()" aria-label="Falar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input id="cq" placeholder="Pergunte ou toque no 🎤" autocomplete="off" enterkeyhint="send"><button>Enviar</button></form></div>`;
   return h}
+let OUVINDO=false,REC=null,VOZ=false;
+function falar(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return toast('Este celular não tem reconhecimento de voz no app. Use o teclado (o microfone do teclado também funciona).');
+  if(OUVINDO&&REC){REC.stop();return}
+  REC=new SR();REC.lang='pt-BR';REC.interimResults=false;REC.maxAlternatives=1;
+  REC.onresult=e=>{const t=e.results[0][0].transcript;VOZ=true;pergAssist(t)};
+  REC.onerror=e=>{OUVINDO=false;render();if(e.error==='not-allowed')toast('Libere o microfone para o app nas configurações do celular');else if(e.error!=='no-speech'&&e.error!=='aborted')toast('Não ouvi bem, tente de novo')};
+  REC.onend=()=>{OUVINDO=false;render()};
+  try{REC.start();OUVINDO=true;render()}catch(e){toast('Microfone ocupado, tente de novo')}}
+function diz(h){try{if(!('speechSynthesis' in window))return;const d=document.createElement('div');d.innerHTML=h.replace(/<\/(div|h4|br)>|<br>/g,'. ');
+  const u=new SpeechSynthesisUtterance(d.textContent.replace(/R\$/g,'reais').replace(/\s+/g,' ').trim());u.lang='pt-BR';speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 function pergAssist(t){t=String(t||'').trim();if(!t)return;chLoad();
   if(/^limpar( conversa)?$/i.test(t)){CH=[];chSave();render();return}
   let r;try{r=responde(t)}catch(e){r='Não consegui montar a resposta ('+esc(e.message)+').'}
-  CH.push({eu:1,t});CH.push({h:r});chSave();render();requestAnimationFrame(()=>window.scrollTo(0,document.body.scrollHeight))}
+  CH.push({eu:1,t});CH.push({h:r});chSave();render();if(VOZ){VOZ=false;diz(r)}requestAnimationFrame(()=>window.scrollTo(0,document.body.scrollHeight))}
 const lnA=(a,b)=>`<div class="ln"><span>${a}</span><span style="text-align:right;white-space:nowrap">${b||''}</span></div>`;
 function responde(t){
   const q=nrm(t),adm=ADM(),C=D.cortes||[],at=ordena(C.filter(c=>!c.retirado)).reverse();
