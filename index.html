@@ -21,6 +21,7 @@ body{background:repeating-linear-gradient(45deg,rgba(255,255,255,.012) 0 2px,tra
 header{position:sticky;top:0;z-index:5;background:rgba(12,11,10,.96);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--acc)}
 header h1{margin:0;font:800 20px/1 var(--serif);letter-spacing:4px;text-transform:uppercase;color:var(--acc)}
 header small{color:var(--mut);font-size:11px;letter-spacing:.5px}
+#inst{position:fixed;left:10px;right:10px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:30;display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:14px;box-shadow:0 8px 22px rgba(0,0,0,.6)}#inst span{flex:1}#inst button{background:var(--acc);color:var(--acc-ink);border:0;border-radius:8px;padding:8px 12px;font-weight:700}#inst .x{background:none;color:var(--mut);padding:8px}
 header button{background:none;border:1px solid var(--line);color:var(--mut);border-radius:6px;padding:6px 9px;font:inherit;font-size:12px}
 main{padding:14px 12px 110px;max-width:640px;margin:0 auto}
 nav{position:fixed;bottom:0;left:0;right:0;background:#0c0b0a;border-top:1px solid var(--acc);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:6}
@@ -114,7 +115,7 @@ tr.tot td{font-weight:700;color:var(--acc);border-bottom:0}
   <p id="ldemo" class="hint"></p>
 </div>
 <div id="app" style="display:none">
-  <header><div><h1 id="htit">Sandel</h1><small id="sub"></small><span id="sync" class="sync"></span></div><div><button class="hb mas" aria-label="Assistente" onclick="ir('assist')"><i id="masc"></i></button><button class="hb" aria-label="Avisos" onclick="ir('avisos')">🔔</button><button onclick="carregar(true)">↻</button></div></header>
+  <header><div><h1 id="htit">Sandel</h1><small id="sub" onclick="contas()" style="cursor:pointer"></small><span id="sync" class="sync"></span></div><div><button class="hb mas" aria-label="Assistente" onclick="ir('assist')"><i id="masc"></i></button><button class="hb" aria-label="Avisos" onclick="ir('avisos')">🔔</button><button onclick="carregar(true)">↻</button></div></header>
   <main id="main"></main>
   <nav id="nav"></nav>
   <div id="fabw"></div>
@@ -251,7 +252,26 @@ async function entrar(){PIN=$('#pin').value.trim();if(!PIN)return;
   const cache=getStore(CK());
   if(cache){try{store('cor_pin',PIN);abrir();setD(JSON.parse(cache),true);carregar();return}catch(e){}}
   try{await call('login');store('cor_pin',PIN);abrir();carregar()}catch(e){$('#lerr').textContent=e.message;if(/PIN/.test(e.message))store('cor_pin')}}
-async function sair(){if(!await pergunta('Sair deste aparelho?'))return;store('cor_pin');store(CK());location.reload()}
+async function sair(){if(!await pergunta('Sair deste aparelho?'))return;const L=lstContas();delete L[PIN];store('cor_contas',JSON.stringify(L));store('cor_pin');store(CK());location.reload()}
+/* ---------- TROCAR DE CONTA (sócios, equipe, cliente) ---------- */
+function lstContas(){try{return JSON.parse(getStore('cor_contas')||'{}')}catch(e){return{}}}
+function guardaConta(pin,u){const L=lstContas();if(!L[pin]||L[pin].nome!==u.nome||L[pin].papel!==u.papel){L[pin]={nome:u.nome,papel:u.papel};store('cor_contas',JSON.stringify(L))}}
+const PAPN={admin:'sócio',equipe:'equipe'};
+function contas(){if(PORTAL)return;const L=lstContas(),ks=Object.keys(L);
+  let h=`<h2>Trocar de conta</h2><div class="k">Contas salvas neste aparelho</div>`;
+  h+=ks.map(k=>`<div class="item" style="display:flex;justify-content:space-between;align-items:center" onclick="mudaConta('${esc(k)}')"><b>${esc(L[k].nome)}</b><span class="pill ${k===PIN?'ok':''}">${k===PIN?'em uso':esc(PAPN[L[k].papel]||L[k].papel||'')}</span></div>`).join('');
+  h+=`<label>Entrar com outro PIN</label><div class="row" style="gap:8px"><input id="npin" type="password" inputmode="numeric" placeholder="PIN" style="flex:1"><button class="btn" style="width:auto" onclick="novoPin()">Entrar</button></div>`;
+  if(ADM()){const C=(D.clientes||[]).filter(c=>c.chave);if(C.length)h+=`<h3>Ver como cliente</h3><div class="k">Abre o portal exatamente como o cliente vê</div>`+C.map(c=>`<div class="item" style="display:flex;justify-content:space-between;align-items:center" onclick="location.href='./?c=${encodeURIComponent(c.chave)}&v=1'"><b>${esc(c.nome)}</b><span class="mut">abrir ›</span></div>`).join('')}
+  open_(h)}
+function mudaConta(pin){if(pin===PIN)return close_();store('cor_pin',pin);location.reload()}
+function novoPin(){const v=$('#npin').value.trim();if(!v)return;store('cor_pin',v);location.reload()}
+function voltaPortal(){const h=$('header');if(!h||$('#vpt'))return;const b=document.createElement('button');b.id='vpt';b.className='hb';b.textContent='← Voltar';b.onclick=()=>location.href='./';h.firstElementChild.prepend(b)}
+/* ---------- INSTALAR DE VERDADE (Android) ---------- */
+let BIP=null;const STANDALONE=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();BIP=e;if(!STANDALONE())mostraInst()});
+addEventListener('appinstalled',()=>{BIP=null;const b=$('#inst');b&&b.remove();toast('App instalado')});
+function mostraInst(){if($('#inst'))return;const b=document.createElement('div');b.id='inst';b.innerHTML='<span>Instale o Corte como app</span><button onclick="instala()">Instalar</button><button class="x" onclick="this.parentNode.remove()">✕</button>';document.body.appendChild(b)}
+async function instala(){if(!BIP)return;BIP.prompt();try{await BIP.userChoice}catch(e){}BIP=null;const b=$('#inst');b&&b.remove()}
 function abrir(){$('#login').style.display='none';$('#app').style.display='block';if(getStore('cor_push')==='1')cfgSW();history.replaceState({t:TAB},'')}
 let RAW=null;
 async function carregar(force){if(CARR)return;CARR=true;sync(true);if(!D)loading(true);
@@ -260,7 +280,7 @@ async function carregar(force){if(CARR)return;CARR=true;sync(true);if(!D)loading
   finally{CARR=false;loading(false);sync(FILA.length>0);if(FILA.length)processaFila()}}
 function setD(d){RAW=d;monta();render()}
 function monta(){D=JSON.parse(JSON.stringify(RAW));D.config=D.config||{};FILA.forEach(it=>{try{opera(D,it.a,it.p)}catch(e){}});
-  $('#sub').textContent=(D.user?D.user.nome:'')+(DEMO?' · demonstração':'')}
+  $('#sub').textContent=(D.user?D.user.nome:'')+(DEMO?' · demonstração':'')+' ▾';if(D.user)guardaConta(PIN,D.user)}
 const ADM=()=>D&&D.user&&D.user.papel==='admin';
 function salvaFila(){store('cor_fila_'+PIN,JSON.stringify(FILA))}
 async function processaFila(){if(ENV||!FILA.length)return;ENV=true;sync(true);
@@ -719,7 +739,7 @@ document.addEventListener('focusin',e=>{const t=e.target;if(t.tagName!=='INPUT'|
 document.addEventListener('focusout',e=>{const t=e.target;if(t.tagName==='INPUT'&&t.closest('.step')&&t.value==='')t.value='0'});
 /* ============ INÍCIO ============ */
 (function(){const q=new URLSearchParams(location.search),c=q.get('c');
-  if(c){portal(c);return}
+  if(c){portal(c);if(q.get('v'))voltaPortal();return}
   if(DEMO)$('#ldemo').textContent='Demonstração: PIN 1234 (Manuel), 5678 (sócio) ou 1111 (equipe)';
   const p=getStore('cor_pin');if(p){$('#pin').value=p;entrar()}})();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
