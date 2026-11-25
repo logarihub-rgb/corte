@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#0f0e0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Sandel">
-<title>Sandel</title>
+<meta name="apple-mobile-web-app-title" content="Corte">
+<title>Corte</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -75,7 +75,8 @@ tr.tot td{font-weight:700;color:var(--acc);border-bottom:0}
 .seq span{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#141210;border-radius:6px;padding:3px 7px;font-size:12px}
 .seq em{font-style:normal;color:var(--mut);font-size:10px}
 .seq .sepf{border-style:dashed;border-color:var(--warn);color:var(--warn)}
-.ft{width:100%;max-height:220px;object-fit:contain;border-radius:8px;border:1px solid var(--line);background:#000;margin-top:8px}
+.ft{width:100%;max-height:220px;object-fit:contain;border-radius:8px;border:1px solid var(--line);background:#000;margin-top:8px;cursor:zoom-in}
+.zv{position:fixed;inset:0;z-index:80;background:#000;display:flex;flex-direction:column}.zh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;color:var(--acc);font-weight:700;font-size:14px;border-bottom:1px solid var(--line)}.zh button{background:none;border:1px solid var(--line);color:var(--txt,#eee);border-radius:20px;width:38px;height:38px;font-size:18px}.zs{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}.zs img{max-width:100%;max-height:100%;object-fit:contain}.zs:has(img.z){display:block}.zs img.z{max-width:none;max-height:none;width:260%}.zt{text-align:center;color:var(--mut);font-size:12px;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
 .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
 .demo{background:#2a2112;border:1px solid #5a4724;color:var(--warn);font-size:12px;padding:8px 10px;border-radius:8px;margin-bottom:10px}
 .fila{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#221f1b;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px;color:var(--warn)}
@@ -364,7 +365,7 @@ function htmlCorte(id){const c=corteDe(id);if(!c)return'';const k=calc(c),cl=cli
     <tr><td>Comprimento × largura</td><td>${c.comp?n1(c.comp)+' m':'—'} × ${c.larg?n1(c.larg)+' m':'—'}</td></tr>
     <tr><td>Encaixes</td><td>${k.T.filter(t=>+(c.enc||{})[t]).map(t=>c.enc[t]+' '+t).join(' + ')||'—'} ${k.encT?'= '+k.encT:''}</td></tr>
     ${k.retT?`<tr><td>Risco de retalho</td><td>${c.retComp?n1(c.retComp)+' m · ':''}${k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+' '+t).join(' + ')} = ${k.retT}</td></tr>`:''}
-  </table>${c.foto?`<img class="ft" data-foto="${esc(c.foto)}" onclick="verFoto('${esc(c.foto)}')">`:''}`;
+  </table>${c.foto?`<img class="ft" data-foto="${esc(c.foto)}" onclick="verFoto('${esc(c.foto)}','${c.id}')"><div class="mut" style="font-size:12px;text-align:center;margin-top:4px">Toque no risco para abrir</div>`:''}`;
   // tecido e peças
   h+=`<h3>Tecido e peças</h3>`;
   if(k.cores.length){h+=`<table><tr><th>Cor</th><th>Rolos</th><th>Folhas</th>${k.retT?'<th>Ret.</th>':''}${k.T.map(t=>`<th>${esc(t)}</th>`).join('')}<th>Total</th></tr>
@@ -404,7 +405,10 @@ function reduzir(file,M=1400,q=.8){return new Promise((res,rej)=>{const img=new 
 async function sobeFoto(b64){const r=await call('foto',{b64},true);FOTOS[r.id]=b64;return r.id}
 async function getFoto(id){if(!id)return'';if(FOTOS[id])return FOTOS[id];try{const r=await call('fotoGet',{id,chave:PORTAL||''},true);if(r.b64)FOTOS[id]=r.b64;return r.b64||''}catch(e){return''}}
 function carregaFotos(){document.querySelectorAll('img[data-foto]').forEach(async im=>{const b=await getFoto(im.dataset.foto);if(b)im.src=b})}
-async function verFoto(id){const b=await getFoto(id);if(!b)return;const w=document.createElement('div');w.className='load';w.style.zIndex=70;w.innerHTML=`<img src="${b}" style="max-width:100%;max-height:100%">`;w.onclick=()=>w.remove();document.body.appendChild(w)}
+function verImg(b,tit){const w=document.createElement('div');w.className='zv';w.innerHTML=`<div class="zh"><span>${esc(tit||'')}</span><button onclick="this.closest('.zv').remove()">✕</button></div><div class="zs"><img src="${b}" onclick="this.classList.toggle('z')"></div><div class="zt">Toque na foto para ampliar</div>`;document.body.appendChild(w)}
+function titFoto(c){if(!c)return'';const cl=cliDe(c.cli)||{};return[c.cod,cl.nome||c._nnome,dbr(c.data)].filter(Boolean).join(' · ')}
+async function verFoto(id,cid){let b=FOTOS[id];if(!b){loading(true,'Abrindo foto…');b=await getFoto(id);loading(false)}if(!b)return toast('Não consegui abrir a foto. Confira a internet.');verImg(b,titFoto(cid?corteDe(cid):null))}
+function verFotoForm(){const b=FORM&&(FORM._fotoB64||FOTOS[FORM.foto]);if(b)return verImg(b,titFoto(FORM));if(FORM&&FORM.foto)verFoto(FORM.foto)}
 
 /* ============ FORM: CORTE ============ */
 let FORM=null;
@@ -423,7 +427,7 @@ function htmlForm(){const F=FORM,adm=ADM(),k=calc(Object.assign({},F,{enc:pick(F
   <div class="k" style="margin-top:4px">Foto do risco (lê os dados sozinho)</div>
   <div class="duo"><button class="btn sec" onclick="$('#friscoC').click()">📷 Câmera</button><button class="btn sec" onclick="$('#friscoA').click()">🖼 Arquivos</button></div>
   <input id="friscoC" type="file" accept="image/*" capture="environment" style="display:none" onchange="lerRisco(this.files[0])"><input id="friscoA" type="file" accept="image/*" style="display:none" onchange="lerRisco(this.files[0])">
-  ${F._fotoB64?`<img class="ft" src="${F._fotoB64}">`:F.foto?`<img class="ft" data-foto="${esc(F.foto)}">`:''}
+  ${F._fotoB64?`<img class="ft" src="${F._fotoB64}" onclick="verFotoForm()">`:F.foto?`<img class="ft" data-foto="${esc(F.foto)}" onclick="verFotoForm()">`:''}
   <div class="grid2"><div><label>Modelo</label><input value="${esc(F.modelo)}" oninput="FORM.modelo=this.value"></div><div><label>Ref. do risco</label><input value="${esc(F.ref)}" oninput="FORM.ref=this.value"></div></div>
   <div class="grid3"><div><label>Aprov. %</label><input inputmode="decimal" value="${F.aprov}" oninput="FORM.aprov=num(this.value)"></div><div><label>Compr. m</label><input inputmode="decimal" value="${F.comp}" oninput="FORM.comp=num(this.value)"></div><div><label>Largura m</label><input inputmode="decimal" value="${F.larg}" oninput="FORM.larg=num(this.value)"></div></div>
   <label>Encaixes por tamanho</label>
