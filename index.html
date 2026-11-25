@@ -21,6 +21,7 @@ body{background:repeating-linear-gradient(45deg,rgba(255,255,255,.012) 0 2px,tra
 header{position:sticky;top:0;z-index:5;background:rgba(12,11,10,.96);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--acc)}
 header h1{margin:0;font:800 20px/1 var(--serif);letter-spacing:4px;text-transform:uppercase;color:var(--acc)}
 header small{color:var(--mut);font-size:11px;letter-spacing:.5px}
+#snk{position:fixed;left:10px;right:10px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:65;display:flex;align-items:center;gap:10px;background:#2a2620;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;box-shadow:0 8px 22px rgba(0,0,0,.6)}#snk span{flex:1}#snk button{background:none;border:0;color:var(--acc);font-weight:800;letter-spacing:.5px;text-transform:uppercase;font-size:13px}
 #inst{position:fixed;left:10px;right:10px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:30;display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:14px;box-shadow:0 8px 22px rgba(0,0,0,.6)}#inst span{flex:1}#inst button{background:var(--acc);color:var(--acc-ink);border:0;border-radius:8px;padding:8px 12px;font-weight:700}#inst .x{background:none;color:var(--mut);padding:8px}
 header button{background:none;border:1px solid var(--line);color:var(--mut);border-radius:6px;padding:6px 9px;font:inherit;font-size:12px}
 main{padding:14px 12px 110px;max-width:640px;margin:0 auto}
@@ -210,7 +211,9 @@ function seqInfesto(cs){const a=(cs||[]).filter(x=>+x.rolos>0).map(x=>({cor:x.co
 function seqHtml(cs){const q=seqInfesto(cs);if(!q.length)return'';let n=0;
   return`<div class="seq">${q.map(x=>x.sep?`<span class="sepf">${dot(x.cor)}1 folha de ${esc(x.cor)}</span>`:`<span><em>${++n}</em>${dot(x.cor)}1 rolo ${esc(x.cor)}</span>`).join('')}</div>${q.some(x=>x.sep)?'<div class="hint">“1 folha” = só uma folha dessa cor para separar, sem gastar o rolo.</div>':''}`}
 // estado da etapa pela ORDEM dos lançamentos (não pelo relógio de cada celular)
-function etSt(c,e){const L=(c.log||[]).filter(x=>x.e===e),u=L[L.length-1],i=L.filter(x=>x.t==='i').pop(),f=L.filter(x=>x.t==='f').pop();
+// "desfazer" (t:'x') cancela o último lançamento da mesma etapa
+function logV(c){const o=[];for(const l of (c.log||[])){if(l.t==='x'){for(let j=o.length-1;j>=0;j--)if(o[j].e===l.e){o.splice(j,1);break}}else o.push(l)}return o}
+function etSt(c,e){const L=logV(c).filter(x=>x.e===e),u=L[L.length-1],i=L.filter(x=>x.t==='i').pop(),f=L.filter(x=>x.t==='f').pop();
   const ok=!!u&&u.t==='f';return{i,f,ok,on:!!u&&u.t==='i'}}
 function proxima(c){for(const[e]of ETAPAS){const s=etSt(c,e);if(!s.ok)return{e,t:s.on?'f':'i'}}return null}
 function pendOc(c){return(c.ocorr||[]).filter(o=>!o.aut&&!o.neg)}
@@ -351,7 +354,12 @@ async function marca(id,e,t){const c=corteDe(id);if(!c)return;
   if(e==='embalagem')return fEmb(id);
   if(e==='contagem')return fFolhas(id,1);
   const st=etSt(c,e);if(t==='i'&&(st.on||st.ok))return;if(t==='f'&&!st.on)return;
-  acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t,em:new Date().toISOString(),por:D.user.nome}},false)}
+  acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t,em:new Date().toISOString(),por:D.user.nome}},false);snackDesf(id,e,ETN[e].split(' ')[0]+(t==='f'?' finalizado':' iniciado'))}
+async function desfaz(id,e,sem){const c=corteDe(id);if(!c)return;const st=etSt(c,e);if(!st.on&&!st.ok)return;
+  if(!sem&&!await pergunta(`Desfazer o último toque em "${ETN[e]}"?`+(st.ok&&st.i&&TIMED[e]?' A etapa volta a contar desde '+hm(st.i.em)+'.':'')))return;
+  const sb=$('#snk');sb&&sb.remove();
+  acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t:'x',em:new Date().toISOString(),por:D.user.nome}},false);toast('Desfeito')}
+function snackDesf(id,e,txt){let b=$('#snk');b&&b.remove();b=document.createElement('div');b.id='snk';b.innerHTML=`<span>${esc(txt)}</span><button onclick="desfaz('${id}','${e}',1)">Desfazer</button>`;document.body.appendChild(b);clearTimeout(window._snk);window._snk=setTimeout(()=>{const x=$('#snk');x&&x.remove()},7000)}
 function rotEt(e,t){if(e==='embalagem')return'Embalar';if(e==='contagem')return'Contar folhas';return(t==='f'?'Finalizar ':'Iniciar ')+ETN[e].split(' ')[0].toLowerCase()}
 async function pular(id,e){if(!await pergunta(`Marcar "${ETN[e]}" como feito (sem horário)?`))return;const em=new Date().toISOString();
   acao('push',{tab:'cortes',id,campo:'log',item:{id:uid(),e,t:'f',em,por:D.user.nome,pulo:1}},false)}
@@ -369,6 +377,7 @@ function htmlCorte(id){const c=corteDe(id);if(!c)return'';const k=calc(c),cl=cli
     if(e==='embalagem'&&st.ok){const P=pk(c);if(P.n)info+=' · '+P.n+' pack'+(P.n>1?'s':'')+'/saco · '+(P.vol||k.sacos.length)+' volumes'}
     if(!c.retirado){if(!TIMED[e]){if(!st.ok)b=`<button class="btn sm" onclick="marca('${id}','${e}','f')">${rotEt(e,'f')}</button>`}
       else if(st.on)b=`<button class="btn sm" onclick="marca('${id}','${e}','f')">Finalizar</button>`;else if(!st.ok)b=`<button class="btn sm sec" onclick="marca('${id}','${e}','i')">Iniciar</button>`+(adm?`<button class="x" style="color:var(--mut);font-size:13px" onclick="pular('${id}','${e}')">pular</button>`:'')}
+    if(!c.retirado&&(st.on||st.ok))b+=`<button class="x" style="color:var(--mut);font-size:13px;margin-left:6px" onclick="desfaz('${id}','${e}')">↩ desfazer</button>`;
     return`<div class="et"><div><span class="nm" style="color:${st.ok?'var(--ok)':st.on?'var(--warn)':'var(--ink)'}">${st.ok?'✓ ':st.on?'▶ ':''}${n}</span><small>${info||'—'}</small></div><div class="row">${b}</div></div>`}).join('');
   // ocorrências
   const oc=c.ocorr||[];
@@ -710,7 +719,7 @@ async function portal(chave){PORTAL=chave;$('#login').style.display='none';$('#a
 
 /* ============ FILA DE CORTE ============ */
 function emAnd(c){return !c.retirado&&!etSt(c,'corte').ok&&(etSt(c,'descanso').on||etSt(c,'descanso').ok||etSt(c,'infesto').on)}
-function naFila(c){return !c.retirado&&!emAnd(c)&&!etSt(c,'corte').ok&&!(c.log||[]).some(l=>l.e==='corte')}
+function naFila(c){return !c.retirado&&!emAnd(c)&&!etSt(c,'corte').ok&&!logV(c).some(l=>l.e==='corte')}
 function ordFila(L){return L.slice().sort((a,b)=>((a.fila??1e9)-(b.fila??1e9))||(a.data||'').localeCompare(b.data||'')||(a.cod||'').localeCompare(b.cod||''))}
 function util(d){return d.getDay()!==0&&(d.getDay()!==6||(D.config||{}).sab!=='0')}
 function previsoes(){const cap=Math.max(1,+(D.config||{}).caprol||20),P={};let d=new Date(hoje()+'T12:00');while(!util(d))d.setDate(d.getDate()+1);let usado=0;
