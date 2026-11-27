@@ -174,7 +174,7 @@ function pode(u,a,p){if(u.papel==='admin')return;
   if(a==='set'&&p.tab==='cortes'&&(p.campo==='cores'||p.campo==='packs'))return;
   throw new Error('Sem permissão')}
 function visao(db,u){const d=JSON.parse(JSON.stringify(db));d.user=u;
-  if(u.papel!=='admin'){d.despesas=[];d.cortes.forEach(c=>{delete c.pags;delete c.preco});d.clientes.forEach(c=>{delete c.preco;delete c.chave});['diaria','socio'].forEach(k=>delete d.config[k])}
+  if(u.papel!=='admin'){d.despesas=[];d.cortes.forEach(c=>{delete c.pags;delete c.preco});d.clientes.forEach(c=>{delete c.preco});['diaria','socio'].forEach(k=>delete d.config[k])}
   return d}
 function portalDe(db,cli){return{cliente:{nome:cli.nome},config:{empresa:db.config.empresa||''},
   cortes:db.cortes.filter(c=>c.cli===cli.id).map(c=>{const x=JSON.parse(JSON.stringify(c));
@@ -272,7 +272,7 @@ function novoPin(){const v=$('#npin').value.trim();if(!v)return;store('cor_pin',
 function voltaPortal(){const h=$('header');if(!h||$('#vpt'))return;const b=document.createElement('button');b.id='vpt';b.className='hb';b.textContent='← Voltar';b.onclick=()=>location.href='./';h.firstElementChild.prepend(b)}
 
 /* ---------- ATUALIZAÇÃO DENTRO DO APP ---------- */
-const VER='corte-v16';
+const VER='corte-v17';
 async function checaVersao(){try{const t=await (await fetch('sw.js?x='+Date.now(),{cache:'no-store'})).text();const m=t.match(/corte-v(\d+)/);if(m&&+m[1]>+VER.split('v')[1])mostraUpd()}catch(e){}}
 function mostraUpd(){if($('#upd'))return;const b=document.createElement('div');b.id='upd';b.innerHTML='<span>Nova versão do app disponível</span><button onclick="atualizaApp()">Atualizar</button>';document.body.appendChild(b)}
 async function atualizaApp(){const b=$('#upd');if(b)b.querySelector('span').textContent='Atualizando…';try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('corte-')).map(k=>caches.delete(k)));const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.update()}catch(e){}location.reload()}
@@ -307,13 +307,13 @@ function vFila(){if(!FILA.length)return'';return`<div class="fila"><span>${FILA.
 const IC={fila:'<svg viewBox="0 0 24 24"><path d="M4 6h12M4 12h16M4 18h9"/><circle cx="20" cy="6" r="1.5"/><circle cx="17" cy="18" r="1.5"/></svg>',hoje:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
  cortes:'<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/></svg>',
  clientes:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.2 2.5 3.6 5.2"/></svg>',
- caixa:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/></svg>'};
+ links:'<svg viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>',caixa:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/></svg>'};
 function ir(t){TAB=t;history.pushState({t},'');render();scrollTo(0,0)}
 window.addEventListener('popstate',e=>{if($('.sheet')){close_(true);history.pushState({t:TAB},'');return}TAB=(e.state&&e.state.t)||'hoje';render()});
 function render(){if(!D)return;
-  const tabs=[['hoje','Hoje'],['fila','Fila'],['cortes','Cortes'],['clientes','Clientes']];if(ADM())tabs.push(['caixa','Caixa']);
+  const tabs=[['hoje','Hoje'],['fila','Fila'],['cortes','Cortes'],['clientes','Clientes'],['links','Links']];if(ADM())tabs.push(['caixa','Caixa']);
   $('#nav').innerHTML=tabs.map(([k,n])=>`<button class="${TAB===k?'on':''}" onclick="ir('${k}')">${IC[k]}${n}</button>`).join('');
-  const V={avisos:vAvisos,assist:vAssist,fila:vFilaCorte,hoje:vHoje,cortes:vCortes,clientes:vClientes,caixa:vCaixa}[TAB]||vHoje;
+  const V={avisos:vAvisos,assist:vAssist,fila:vFilaCorte,hoje:vHoje,cortes:vCortes,clientes:vClientes,caixa:vCaixa,links:vLinks}[TAB]||vHoje;
   $('#main').innerHTML=(DEMO?'<div class="demo">Modo demonstração — os dados ficam só neste aparelho. PINs: 1234 (Manuel), 5678 (sócio), 1111 (equipe).</div>':'')+vFila()+V();
   const fab={fila:['+ Corte','fCorte()'],hoje:['+ Corte','fCorte()'],cortes:['+ Corte','fCorte()'],clientes:['+ Cliente','fCliente()'],caixa:['+ Despesa','fDespesa()']}[TAB];
   $('#fabw').innerHTML=ADM()&&fab?`<button class="fab" onclick="${fab[1]}">${fab[0]}</button>`:''}
@@ -680,6 +680,23 @@ function salvaCli(id){const nm=$('#cn').value.trim();if(!nm)return toast('Nome')
   const rec=Object.assign({},old,{id:id||uid(),nome:nm,tel:old.tel||'',preco:num($('#cp').value)||0,fora:$('#cf').checked,chave:old.chave||chave()});
   acao('put',{tab:'clientes',rec})}
 
+
+/* ============ LINKS DOS CLIENTES (acompanhar em tempo real) ============ */
+let LKC='';
+function vLinks(){const C=[...(D.clientes||[])].sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+  let h=`<h2 style="margin:4px 0 2px">Link do cliente</h2><div class="mut" style="margin-bottom:12px">Cada cliente vê só os cortes dele, com as etapas em tempo real.</div>
+  <select id="lkc" onchange="LKC=this.value;render()" style="width:100%"><option value="">Selecione o cliente…</option>${C.map(c=>`<option value="${c.id}" ${c.id===LKC?'selected':''}>${esc(c.nome)}</option>`).join('')}</select>`;
+  const c=LKC&&cliDe(LKC);
+  if(c){if(!c.chave){h+=`<div class="card" style="margin-top:12px"><div class="mut">Este cliente ainda não tem link.</div><button class="btn" style="margin-top:10px" onclick="geraLink('${c.id}')">Gerar link</button></div>`}
+    else{const u=linkPortal(c),n=(D.cortes||[]).filter(x=>x.cli===c.id&&!x.retirado).length;
+      h+=`<div class="card" style="margin-top:12px"><div class="k">Link de ${esc(c.nome)}</div><div style="word-break:break-all;font-size:14px;margin:6px 0 4px;color:var(--acc)">${esc(u)}</div><div class="mut" style="font-size:12px">${n} corte${n===1?'':'s'} em andamento</div>
+      <button class="btn wa" style="margin-top:12px" onclick="enviaLink('${c.id}')">Enviar no WhatsApp</button>
+      <div class="row" style="gap:8px;margin-top:8px"><button class="btn sec" style="flex:1" onclick="copiaLink('${c.id}')">Copiar link</button><button class="btn sec" style="flex:1" onclick="location.href='${u}&v=1'">Ver como ele vê</button></div></div>`}}
+  return h}
+function msgLink(c){return `Olá${c.nome?' '+c.nome.split(' ')[0]:''}! Acompanhe seus cortes na Sandel em tempo real por este link:\n${linkPortal(c)}`}
+function enviaLink(id){const c=cliDe(id);if(!c||!c.chave)return;location.href='https://wa.me/?text='+encodeURIComponent(msgLink(c))}
+async function copiaLink(id){const c=cliDe(id);try{await navigator.clipboard.writeText(linkPortal(c));toast('Link copiado')}catch(e){prompt('Copie o link:',linkPortal(c))}}
+function geraLink(id){const c=cliDe(id);if(!c)return;const rec=Object.assign({},c,{chave:chave()});acao('put',{tab:'clientes',rec})}
 /* ============ CAIXA (só sócios) ============ */
 let CX={m:'semana',ref:hoje()};
 function faixa(){const d=new Date(CX.ref+'T12:00');if(CX.m==='dia')return[CX.ref,CX.ref];
