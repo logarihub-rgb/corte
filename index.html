@@ -272,7 +272,7 @@ function novoPin(){const v=$('#npin').value.trim();if(!v)return;store('cor_pin',
 function voltaPortal(){const h=$('header');if(!h||$('#vpt'))return;const b=document.createElement('button');b.id='vpt';b.className='hb';b.textContent='← Voltar';b.onclick=()=>location.href='./';h.firstElementChild.prepend(b)}
 
 /* ---------- ATUALIZAÇÃO DENTRO DO APP ---------- */
-const VER='corte-v17';
+const VER='corte-v18';
 async function checaVersao(){try{const t=await (await fetch('sw.js?x='+Date.now(),{cache:'no-store'})).text();const m=t.match(/corte-v(\d+)/);if(m&&+m[1]>+VER.split('v')[1])mostraUpd()}catch(e){}}
 function mostraUpd(){if($('#upd'))return;const b=document.createElement('div');b.id='upd';b.innerHTML='<span>Nova versão do app disponível</span><button onclick="atualizaApp()">Atualizar</button>';document.body.appendChild(b)}
 async function atualizaApp(){const b=$('#upd');if(b)b.querySelector('span').textContent='Atualizando…';try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('corte-')).map(k=>caches.delete(k)));const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.update()}catch(e){}location.reload()}
@@ -584,54 +584,59 @@ async function jspdf(){await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.
 function imgDim(b){return new Promise(ok=>{const i=new Image();i.onload=()=>ok([i.width,i.height]);i.onerror=()=>ok([4,3]);i.src=b})}
 async function pdfCliente(id,c){c=c||corteDe(id);loading(true,'Gerando PDF…');let file;try{
   const J=await jspdf(),doc=new J({unit:'mm',format:'a4',orientation:'portrait'}),k=calc(c),cl=PORTAL?PDATA.cliente:cliDe(c.cli),cfg=(PORTAL?PDATA.config:D.config)||{},P=pk(c);
-  const G=[184,144,79],W=210,M=14;let y;
-  doc.setFillColor(15,14,13);doc.rect(0,0,W,30,'F');doc.setTextColor(...G);doc.setFont('times','bold');doc.setFontSize(24);doc.text('SANDEL',M,18);
-  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(220,210,190);doc.text('CORTE · ESPECIFICAÇÃO',M,25);
-  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text(c.cod,W-M,17,{align:'right'});doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text(dbrY(c.data),W-M,24,{align:'right'});
-  // ---- 1 página: cabeçalho
-  doc.setTextColor(25);doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text(cl.nome||'',M,39);doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(110);doc.text((c.modelo||'')+(c.ref?' · risco '+c.ref:''),M,44.5);
-  y=49;
-  const tit=(t,x,yy)=>{doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...G);doc.text(t.toUpperCase(),x,yy)};
-  const LN=[225,218,205];
-  // ---- risco (esquerda) + foto (direita)
+  // paleta 60/30/10: branco e off-white (base) · grafite (texto e estrutura) · dourado (só detalhes)
+  const G=[184,144,79],GD=[150,112,50],K=[34,31,27],K2=[95,90,82],OW=[246,243,237],LN=[228,223,214],W=210,M=14;let y;
+  const lbl=(t,x,yy,o)=>{doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...K2);doc.setCharSpace(.4);doc.text(t.toUpperCase(),x,yy,o||{});doc.setCharSpace(0)};
+  // cabeçalho: faixa grafite fina, marca em dourado
+  doc.setFillColor(...K);doc.rect(0,0,W,24,'F');doc.setFillColor(...G);doc.rect(0,24,W,.8,'F');
+  doc.setTextColor(...G);doc.setFont('times','bold');doc.setFontSize(21);doc.setCharSpace(1.2);doc.text('SANDEL',M,13.5);doc.setCharSpace(0);
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(200,192,178);doc.setCharSpace(.6);doc.text('ESPECIFICAÇÃO DE CORTE',M,19);doc.setCharSpace(0);
+  doc.setTextColor(255);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(c.cod,W-M,13.5,{align:'right'});doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,192,178);doc.text(dbrY(c.data),W-M,19,{align:'right'});
+  // cliente
+  lbl('Cliente',M,33);doc.setTextColor(...K);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text(cl.nome||'',M,39.5);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...K2);doc.text((c.modelo||'')+(c.ref?' · risco '+c.ref:''),M,45);
+  y=52;
+  let sn=0;const secao=t=>{sn++;doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(...G);doc.text(String(sn).padStart(2,'0'),M,y+3.2);doc.setFontSize(9.5);doc.setTextColor(...K);doc.setCharSpace(.5);doc.text(t.toUpperCase(),M+6,y+3.2);doc.setCharSpace(0);y+=5.5};
+  const BS={theme:'plain',margin:{left:M,right:M},styles:{fontSize:9.5,cellPadding:{top:1.15,bottom:1.15,left:2,right:2},textColor:K,lineColor:LN,lineWidth:{bottom:.2},overflow:'linebreak'}};
+  // 01 risco + foto
   let ft='';try{ft=c.foto?await getFoto(c.foto):''}catch(e){}
   const encS=k.T.filter(t=>+(c.enc||{})[t]).map(t=>c.enc[t]+'x '+t).join(' + ');
   const rk=[['Aproveitamento',c.aprov?n1(c.aprov)+'%':'—'],['Comprimento',c.comp?n1(c.comp)+' m':'—'],['Largura',c.larg?n1(c.larg)+' m':'—'],['Encaixes',(encS||'—')+(k.encT?' = '+k.encT:'')]];
   if(k.retT)rk.push(['Retalho',(c.retComp?n1(c.retComp)+' m · ':'')+k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+'x '+t).join(' + ')+' = '+k.retT+' encaixes']);
-  const wR=ft?112:W-2*M;tit('Risco',M,y+3);
-  doc.autoTable({startY:y+5,theme:'plain',body:rk,margin:{left:M,right:W-M-wR},tableWidth:wR,styles:{fontSize:9.5,cellPadding:{top:1.2,bottom:1.2,left:1.5,right:1.5},textColor:25,lineColor:LN,lineWidth:{bottom:.2}},columnStyles:{0:{cellWidth:32,textColor:110}}});
+  const y0=y;secao('Risco');const wR=ft?118:W-2*M;
+  doc.autoTable(Object.assign({},BS,{startY:y,body:rk,margin:{left:M,right:W-M-wR},tableWidth:wR,columnStyles:{0:{cellWidth:38,textColor:K2,fillColor:[236,229,215]}},alternateRowStyles:{fillColor:[250,248,244]}}));
   let yR=doc.lastAutoTable.finalY;
-  if(ft){try{const[w,h]=await imgDim(ft);let bw=W-2*M-wR-5,bh=Math.max(yR-y,34);let iw=bw,ih=iw*h/w;if(ih>bh){ih=bh;iw=ih*w/h}const x0=W-M-iw;doc.setDrawColor(...LN);doc.setLineWidth(.2);doc.addImage(ft,'JPEG',x0,y+1,iw,ih);doc.rect(x0,y+1,iw,ih);yR=Math.max(yR,y+1+ih)}catch(e){}}
+  if(ft){try{const[w,h]=await imgDim(ft);const bw=W-2*M-wR-6,bh=Math.max(yR-y0,36);let iw=bw,ih=iw*h/w;if(ih>bh){ih=bh;iw=ih*w/h}const x0=W-M-iw;doc.addImage(ft,'JPEG',x0,y0,iw,ih);doc.setDrawColor(...LN);doc.setLineWidth(.3);doc.rect(x0,y0,iw,ih);yR=Math.max(yR,y0+ih)}catch(e){}}
   y=yR+7;
-  // ---- tecido e peças: cores nas colunas
+  // blocos com o mesmo desenho
   const cs=k.cores,nc=cs.length,fs=nc>8?7.5:nc>6?8.5:9.5;
-  const head=['',...cs.map(x=>x.cor),'Total'];
-  const lin=(nome,f,tot,st)=>[{content:nome,styles:Object.assign({textColor:90},st||{})},...cs.map(x=>({content:n0(f(x)),styles:st||{}})),{content:n0(tot),styles:Object.assign({fontStyle:'bold'},st||{})}];
-  const sep=t=>[{content:t,colSpan:nc+2,styles:{fontStyle:'bold',textColor:G,fontSize:fs-.5,fillColor:[247,243,235],cellPadding:{top:1,bottom:1,left:1.5,right:1.5}}}];
-  const body=[sep('Tecido'),lin('Rolos',x=>x.rolos,k.rolos),lin('Folhas',x=>x.folhas,k.folhas)];
-  if(k.retT)body.push(lin('Folhas de retalho',x=>x.fret,k.fret));
-  body.push([{content:'',colSpan:nc+2,styles:{minCellHeight:5,lineWidth:0,cellPadding:0}}]);body.push(sep('Peças por tamanho'));
-  k.T.forEach(t=>{if(k.porT[t])body.push(lin(t,x=>x.p[t]||0,k.porT[t]))});
-  body.push(lin('Total de peças',x=>x.tot,k.total,{fontStyle:'bold',fillColor:[240,234,222],textColor:20}));
-  tit('Tecido e peças por cor',M,y);
-  const cst={0:{halign:'left',cellWidth:nc>6?30:36}};for(let i=1;i<=nc+1;i++)cst[i]={halign:'right'};
-  doc.autoTable({startY:y+2,theme:'plain',head:[head],body,margin:{left:M,right:M},styles:{fontSize:fs,cellPadding:{top:1.3,bottom:1.3,left:1.5,right:1.5},textColor:25,lineColor:LN,lineWidth:{bottom:.2},overflow:'linebreak'},headStyles:{fillColor:[34,31,27],textColor:G,fontStyle:'bold',fontSize:fs},columnStyles:cst,didParseCell:d=>{if(d.section==='head')d.cell.styles.halign=d.column.index===0?'left':'right'}});
-  y=doc.lastAutoTable.finalY+(k.retalho?4:7);
-  if(k.retalho){doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(110);doc.text('Inclui '+n0(k.retalho)+' peças do retalho ('+k.fret+' folhas × '+k.retT+').',M,y);y+=5}
-  // ---- caixas: total / embalagem / valor
+  const bloco=(titulo,head,rows,tot)=>{secao(titulo);const ncol=head.length,cst={0:{halign:'left',cellWidth:38,textColor:K2,fillColor:[243,238,228]}};for(let i=1;i<ncol;i++)cst[i]={halign:'right'};cst[ncol-1]=Object.assign({},cst[ncol-1],{fontStyle:'bold'});
+    const body=rows.map(r=>r.map(v=>String(v)));
+    if(tot)body.push(tot.map(v=>({content:String(v),styles:{fontStyle:'bold',textColor:K,fillColor:[228,219,201],lineColor:K2,lineWidth:{top:.3,bottom:0}}})));
+    doc.autoTable(Object.assign({},BS,{startY:y,head:[head],body,styles:Object.assign({},BS.styles,{fontSize:fs}),headStyles:{fillColor:[236,229,215],textColor:K,fontStyle:'bold',fontSize:fs,lineColor:G,lineWidth:{bottom:.6}},alternateRowStyles:{fillColor:[250,248,244]},columnStyles:cst,didParseCell:d=>{if(d.section==='head')d.cell.styles.halign=d.column.index===0?'left':'right'}}));
+    y=doc.lastAutoTable.finalY+6};
+  const hc=['',...cs.map(x=>x.cor),'Total'],lc=(nome,f,tot)=>[nome,...cs.map(x=>n0(f(x))),n0(tot)];
+  bloco('Tecido',hc,[lc('Rolos',x=>x.rolos,k.rolos)]);
+  bloco('Corte',hc,[lc('Folhas',x=>x.folhas,k.folhas),...(k.retT?[lc('Folhas de retalho',x=>x.fret,k.fret)]:[])]);
+  bloco('Peças por tamanho',hc,k.T.filter(t=>k.porT[t]).map(t=>lc(t,x=>x.p[t]||0,k.porT[t])),lc('Total de peças',x=>x.tot,k.total));
+  if(k.retalho){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...K2);doc.text('Inclui '+n0(k.retalho)+' peças do retalho ('+k.fret+' folhas × '+k.retT+').',M,y-2);y+=3}
+  if(k.sacos.length){const g={},ord=[],pks=new Set();k.sacos.forEach(sc=>{const key=sc.tam+(sc.ret?' ret.':'');if(!g[key]){g[key]={};ord.push(key)}g[key][sc.packs]=(g[key][sc.packs]||0)+1;pks.add(sc.packs)});
+    const PS=[...pks].sort((a,b)=>b-a),sv=key=>Object.values(g[key]).reduce((a,b)=>a+b,0);
+    bloco('Embalagem',['',...ord,'Total'],PS.map(n=>['Volumes com '+n+(n>1?' packs':' pack'),...ord.map(key=>g[key][n]||'—'),k.sacos.filter(x=>x.packs===n).length]),['Total de volumes',...ord.map(sv),k.sacos.length])}
+  // resumo: embalagem · total de peças · valor
   const bx=[];
-  if(P.n||etSt(c,'embalagem').ok)bx.push(['EMBALAGEM',String(P.vol||k.sacos.length||'—')+' volumes',(P.n?P.n+' pack'+(P.n>1?'s':'')+' por saco':'')]);
-  bx.push(['TOTAL DE PEÇAS',n0(k.total),'']);
-  if(k.valor>0)bx.push(['VALOR DO CORTE',brl(k.pago?k.saldo:k.valor),k.pago?'saldo · total '+brl(k.valor)+' · pago '+brl(k.pago):n0(k.total)+' × '+brl(k.preco)]);
-  const gw=4,bw=(W-2*M-gw*(bx.length-1))/bx.length;
-  bx.forEach((b,i)=>{const x=M+i*(bw+gw);doc.setFillColor(240,234,222);doc.roundedRect(x,y,bw,20,1.5,1.5,'F');doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(110);doc.text(b[0],x+3,y+5.5);doc.setFontSize(bx.length>2?13:15);doc.setTextColor(20);doc.text(b[1],x+3,y+12.5);if(b[2]){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(100);doc.text(doc.splitTextToSize(b[2],bw-6)[0],x+3,y+17.3)}});
-  y+=27;
-  // ---- ocorrências autorizadas
-  const oa=(c.ocorr||[]).filter(o=>o.aut);if(oa.length){tit('Ocorrências autorizadas pelo cliente',M,y);doc.autoTable({startY:y+2,theme:'plain',body:oa.map(o=>[o.desc||'—',dbrY(o.aut)]),margin:{left:M,right:M},styles:{fontSize:9,cellPadding:1.2,textColor:25,lineColor:LN,lineWidth:{bottom:.2}},columnStyles:{1:{halign:'right',cellWidth:30}}});y=doc.lastAutoTable.finalY+7}
-  // ---- pagamento
-  if(cfg.pix){if(y>262){doc.addPage();y=16}tit('Pagamento',M,y);y+=3;
-    doc.setDrawColor(...G);doc.setLineWidth(.4);doc.roundedRect(M,y,W-2*M,cfg.pixnome?18:13,2,2);doc.setTextColor(110);doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.text('Chave PIX',M+4,y+5);
-    doc.setTextColor(20);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text(String(cfg.pix),M+4,y+10.5);if(cfg.pixnome){doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90);doc.text('Favorecido: '+cfg.pixnome,M+4,y+15.3)}y+=24}
+  if(P.n||etSt(c,'embalagem').ok)bx.push(['Embalagem',String(P.vol||k.sacos.length||'—')+' volumes',(P.n?P.n+' pack'+(P.n>1?'s':'')+' por volume':''),K]);
+  bx.push(['Total de peças',n0(k.total),'',K]);
+  if(k.valor>0)bx.push(['Valor do corte',brl(k.pago?k.saldo:k.valor),k.pago?'saldo · total '+brl(k.valor)+' · pago '+brl(k.pago):n0(k.total)+' × '+brl(k.preco),GD]);
+  y+=1;const gw=4,bw=(W-2*M-gw*(bx.length-1))/bx.length;
+  bx.forEach((b,i)=>{const x=M+i*(bw+gw);doc.setFillColor(...OW);doc.rect(x,y,bw,19,'F');doc.setFillColor(...(i===bx.length-1&&k.valor>0?G:K));doc.rect(x,y,bw,.8,'F');lbl(b[0],x+3.5,y+6);doc.setFont('helvetica','bold');doc.setFontSize(bx.length>2?13.5:15);doc.setTextColor(...b[3]);doc.text(b[1],x+3.5,y+12.8);if(b[2]){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...K2);doc.text(doc.splitTextToSize(b[2],bw-7)[0],x+3.5,y+16.8)}});
+  y+=26;
+  // ocorrências autorizadas
+  const oa=(c.ocorr||[]).filter(o=>o.aut);if(oa.length){secao('Ocorrências autorizadas pelo cliente');doc.autoTable(Object.assign({},BS,{startY:y,body:oa.map(o=>[o.desc||'—',dbrY(o.aut)]),columnStyles:{1:{halign:'right',cellWidth:30}}}));y=doc.lastAutoTable.finalY+7}
+  // pagamento
+  if(cfg.pix){if(y>266){doc.addPage();y=16}secao('Pagamento');const hb=cfg.pixnome?17:12;
+    doc.setFillColor(...OW);doc.rect(M,y,W-2*M,hb,'F');doc.setFillColor(...G);doc.rect(M,y,1.2,hb,'F');lbl('Chave PIX',M+5,y+5);
+    doc.setTextColor(...K);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text(String(cfg.pix),M+5,y+10.3);if(cfg.pixnome){doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...K2);doc.text('Favorecido: '+cfg.pixnome,M+5,y+14.6)}y+=hb+6}
   const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(150);doc.setFont('helvetica','normal');doc.text('Sandel · '+c.cod+' · página '+i+'/'+n,W/2,290,{align:'center'})}
   const blob=doc.output('blob');file=new File([blob],`Corte ${c.cod} - ${cl.nome}.pdf`,{type:'application/pdf'});
   }catch(e){loading(false);return toast('Não gerou o PDF: '+e.message)}
