@@ -589,7 +589,7 @@ async function pdfCliente(id,c){c=c||corteDe(id);loading(true,'Gerando PDF…');
   let ft='';try{ft=c.foto?await getFoto(c.foto):''}catch(e){}
   const encS=k.T.filter(t=>+(c.enc||{})[t]).map(t=>c.enc[t]+'x '+t).join(' + ');
   const rk=[['Aproveitamento',c.aprov?n1(c.aprov)+'%':'—'],['Comprimento',c.comp?n1(c.comp)+' m':'—'],['Largura',c.larg?n1(c.larg)+' m':'—'],['Encaixes',(encS||'—')+(k.encT?' = '+k.encT:'')]];
-  if(k.retT)rk.push(['Retalho',(c.retComp?n1(c.retComp)+' m · ':'')+k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+'x '+t).join(' + ')+' = '+k.retT]);
+  if(k.retT)rk.push(['Retalho',(c.retComp?n1(c.retComp)+' m · ':'')+k.T.filter(t=>+(c.ret||{})[t]).map(t=>c.ret[t]+'x '+t).join(' + ')+' = '+k.retT+' encaixes']);
   const wR=ft?112:W-2*M;tit('Risco',M,y+3);
   doc.autoTable({startY:y+5,theme:'plain',body:rk,margin:{left:M,right:W-M-wR},tableWidth:wR,styles:{fontSize:9.5,cellPadding:{top:1.2,bottom:1.2,left:1.5,right:1.5},textColor:25,lineColor:LN,lineWidth:{bottom:.2}},columnStyles:{0:{cellWidth:32,textColor:110}}});
   let yR=doc.lastAutoTable.finalY;
