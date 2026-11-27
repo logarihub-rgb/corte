@@ -22,6 +22,7 @@ header{position:sticky;top:0;z-index:5;background:rgba(12,11,10,.96);padding:cal
 header h1{margin:0;font:800 20px/1 var(--serif);letter-spacing:4px;text-transform:uppercase;color:var(--acc)}
 header small{color:var(--mut);font-size:11px;letter-spacing:.5px}
 #snk{position:fixed;left:10px;right:10px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:65;display:flex;align-items:center;gap:10px;background:#2a2620;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;box-shadow:0 8px 22px rgba(0,0,0,.6)}#snk span{flex:1}#snk button{background:none;border:0;color:var(--acc);font-weight:800;letter-spacing:.5px;text-transform:uppercase;font-size:13px}
+#upd{position:fixed;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));z-index:90;display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:14px;box-shadow:0 8px 22px rgba(0,0,0,.6)}#upd span{flex:1}#upd button{background:var(--acc);color:var(--acc-ink);border:0;border-radius:8px;padding:8px 14px;font-weight:700}
 #inst{position:fixed;left:10px;right:10px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:30;display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:14px;box-shadow:0 8px 22px rgba(0,0,0,.6)}#inst span{flex:1}#inst button{background:var(--acc);color:var(--acc-ink);border:0;border-radius:8px;padding:8px 12px;font-weight:700}#inst .x{background:none;color:var(--mut);padding:8px}
 header button{background:none;border:1px solid var(--line);color:var(--mut);border-radius:6px;padding:6px 9px;font:inherit;font-size:12px}
 main{padding:14px 12px 110px;max-width:640px;margin:0 auto}
@@ -269,6 +270,13 @@ function contas(){if(PORTAL)return;const L=lstContas(),ks=Object.keys(L);
 function mudaConta(pin){if(pin===PIN)return close_();store('cor_pin',pin);location.reload()}
 function novoPin(){const v=$('#npin').value.trim();if(!v)return;store('cor_pin',v);location.reload()}
 function voltaPortal(){const h=$('header');if(!h||$('#vpt'))return;const b=document.createElement('button');b.id='vpt';b.className='hb';b.textContent='← Voltar';b.onclick=()=>location.href='./';h.firstElementChild.prepend(b)}
+
+/* ---------- ATUALIZAÇÃO DENTRO DO APP ---------- */
+const VER='corte-v16';
+async function checaVersao(){try{const t=await (await fetch('sw.js?x='+Date.now(),{cache:'no-store'})).text();const m=t.match(/corte-v(\d+)/);if(m&&+m[1]>+VER.split('v')[1])mostraUpd()}catch(e){}}
+function mostraUpd(){if($('#upd'))return;const b=document.createElement('div');b.id='upd';b.innerHTML='<span>Nova versão do app disponível</span><button onclick="atualizaApp()">Atualizar</button>';document.body.appendChild(b)}
+async function atualizaApp(){const b=$('#upd');if(b)b.querySelector('span').textContent='Atualizando…';try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('corte-')).map(k=>caches.delete(k)));const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.update()}catch(e){}location.reload()}
+addEventListener('load',()=>setTimeout(checaVersao,1500));document.addEventListener('visibilitychange',()=>{if(!document.hidden)checaVersao()});
 /* ---------- INSTALAR DE VERDADE (Android) ---------- */
 let BIP=null;const STANDALONE=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();BIP=e;if(!STANDALONE())mostraInst()});
