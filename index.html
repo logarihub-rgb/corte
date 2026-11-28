@@ -272,7 +272,7 @@ function novoPin(){const v=$('#npin').value.trim();if(!v)return;store('cor_pin',
 function voltaPortal(){const h=$('header');if(!h||$('#vpt'))return;const b=document.createElement('button');b.id='vpt';b.className='hb';b.textContent='← Voltar';b.onclick=()=>location.href='./';h.firstElementChild.prepend(b)}
 
 /* ---------- ATUALIZAÇÃO DENTRO DO APP ---------- */
-const VER='corte-v19';
+const VER='corte-v20';
 async function checaVersao(){try{const t=await (await fetch('sw.js?x='+Date.now(),{cache:'no-store'})).text();const m=t.match(/corte-v(\d+)/);if(m&&+m[1]>+VER.split('v')[1])mostraUpd()}catch(e){}}
 function mostraUpd(){if($('#upd'))return;const b=document.createElement('div');b.id='upd';b.innerHTML='<span>Nova versão do app disponível</span><button onclick="atualizaApp()">Atualizar</button>';document.body.appendChild(b)}
 async function atualizaApp(){const b=$('#upd');if(b)b.querySelector('span').textContent='Atualizando…';try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('corte-')).map(k=>caches.delete(k)));const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.update()}catch(e){}location.reload()}
@@ -780,7 +780,7 @@ function itemFila(c,P,n,adm,prim,ult){const k=calc(c),cl=cliDe(c.cli),s=status(c
 function moveFila(id,dir){const L=ordFila(D.cortes.filter(naFila)),i=L.findIndex(c=>c.id===id),j=i+dir;if(i<0||j<0||j>=L.length)return;
   [L[i],L[j]]=[L[j],L[i]];L.forEach((c,x)=>{if(c.fila!==x+1)acao('set',{tab:'cortes',id:c.id,campo:'fila',valor:x+1},false)})}
 /* ============ MASCOTE (rolo de tecido) ============ */
-function mascote(cl){return`<svg viewBox="0 0 100 100" ${cl?`class="${cl}"`:""} aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#1d1a14" stroke="#c9a24d" stroke-width="4"/><line x1="50" y1="14" x2="50" y2="24" stroke="#c9a24d" stroke-width="3"/><circle cx="50" cy="12" r="4.5" fill="#f0c95c"/><rect x="24" y="24" width="52" height="42" rx="14" fill="#c9a24d"/><rect x="31" y="32" width="38" height="24" rx="9" fill="#14120e"/><circle cx="42" cy="44" r="5" fill="#7fe3c4"/><circle cx="58" cy="44" r="5" fill="#7fe3c4"/><path d="M44 51 Q50 55 56 51" stroke="#7fe3c4" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M30 70 h40 l-4 14 h-32z" fill="#c9a24d"/><path d="M42 72 L50 82 L58 72" stroke="#14120e" stroke-width="3" fill="none"/></svg>`}
+function mascote(cl){return`<svg viewBox="0 0 100 100" ${cl?`class="${cl}"`:""} aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#1d1a14" stroke="#c9a24d" stroke-width="4"/><line x1="50" y1="14" x2="50" y2="24" stroke="#c9a24d" stroke-width="3"/><circle cx="50" cy="12" r="4.5" fill="#f0c95c"/><rect x="24" y="24" width="52" height="42" rx="14" fill="#c9a24d"/><rect x="31" y="32" width="38" height="24" rx="9" fill="#14120e"/><circle cx="42" cy="44" r="5" fill="#8fae6b"/><circle cx="58" cy="44" r="5" fill="#8fae6b"/><path d="M44 51 Q50 55 56 51" stroke="#8fae6b" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M30 70 h40 l-4 14 h-32z" fill="#c9a24d"/><path d="M42 72 L50 82 L58 72" stroke="#14120e" stroke-width="3" fill="none"/></svg>`}
 (function(){const m=document.getElementById('masc');if(m)m.outerHTML=mascote()})();
 /* ============ CAMPOS NUMÉRICOS ============ */
 document.addEventListener('focusin',e=>{const t=e.target;if(t.tagName!=='INPUT'||!/numeric|decimal/.test(t.inputMode||'')||t.type==='password')return;
